@@ -1,0 +1,221 @@
+// -----------------------------------------------------------------------------
+// Student Attendance Management System - PostgreSQL schema (Prisma ORM 7)
+//
+// Models use camelCase in JavaScript but are mapped (@map / @@map) to the
+// snake_case table and column names from the project plan, so the database
+// itself matches the 11-table design exactly. The extra `session` table at the
+// bottom is infrastructure for express-session (connect-pg-simple).
+//
+// Constraints Prisma cannot express (CHECK constraints and partial unique
+// indexes) are added by hand in the migration SQL - see
+// src/db/migrations/*_integrity_constraints/migration.sql.
+// -----------------------------------------------------------------------------
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Lecturer and administrator accounts share the `users` table; the role
+/// decides which login system (and which API routes) the account can use.
+enum Role {
+  LECTURER
+  ADMIN
+}
+
+/// When a module is taught. "1" and "2" are the regular semesters, YEAR is a
+/// year-long module (available in both semesters, e.g. PRJ4020) and EITHER
+/// means the diet sheet lets students take it in either semester (e.g. the
+/// Community Service Project, or an elective pool with no semester given).
+enum SemesterSlot {
+  SEM1   @map("1")
+  SEM2   @map("2")
+  YEAR
+  EITHER
+
+  @@map("semester_slot")
+}
+
+// ---------------------------------------------------------------- catalog ---
+
+model School {
+  id       Int       @id @default(autoincrement())
+  code     String    @unique @db.VarChar(20)
+  name     String    @db.VarChar(150)
+  programs Program[]
+
+  @@map("schools")
+}
+
+model Program {
+  id             Int             @id @default(autoincrement())
+  schoolId       Int             @map("school_id")
+  name           String          @db.VarChar(150)
+  major          String?         @db.VarChar(150)
+  school         School          @relation(fields: [schoolId], references: [id], onDelete: Restrict)
+  programModules ProgramModule[]
+  students       Student[]
+
+  @@index([schoolId])
+  @@map("programs")
+}
+
+model Module {
+  id              Int              @id @default(autoincrement())
+  code            String           @unique @db.VarChar(20)
+  name            String           @db.VarChar(200)
+  /// Null when the diet sheet does not list the module's credits.
+  credits         Int?
+  programModules  ProgramModule[]
+  lecturerModules LecturerModule[]
+  enrollments     Enrollment[]
+  classSessions   ClassSession[]
+
+  @@map("modules")
+}
+
+/// Junction table: which modules a programme offers, at which level and in
+/// which semester slot. Modules that share a `choiceGroup` within a programme
+/// are an either/or set - a student may take only one of them per semester.
+model ProgramModule {
+  programId    Int          @map("program_id")
+  moduleId     Int          @map("module_id")
+  level        Int
+  semesterSlot SemesterSlot @map("semester_slot")
+  choiceGroup  String?      @map("choice_group") @db.VarChar(60)
+  program      Program      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  module       Module       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@id([programId, moduleId])
+  @@index([moduleId])
+  @@map("program_modules")
+}
+
+model Semester {
+  id              Int              @id @default(autoincrement())
+  academicYear    String           @map("academic_year") @db.VarChar(9)
+  term            Int
+  startDate       DateTime         @map("start_date") @db.Date
+  endDate         DateTime         @map("end_date") @db.Date
+  lecturerModules LecturerModule[]
+  enrollments     Enrollment[]
+  classSessions   ClassSession[]
+
+  @@unique([academicYear, term])
+  @@map("semesters")
+}
+
+// ----------------------------------------------------------------- people ---
+
+model Student {
+  id          Int          @id @default(autoincrement())
+  idNumber    String       @unique @map("id_number") @db.VarChar(20)
+  firstName   String       @map("first_name") @db.VarChar(100)
+  lastName    String       @map("last_name") @db.VarChar(100)
+  email       String       @unique @db.VarChar(254)
+  programId   Int          @map("program_id")
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  program     Program      @relation(fields: [programId], references: [id], onDelete: Restrict)
+  enrollments Enrollment[]
+  attendance  Attendance[]
+
+  @@index([programId])
+  @@map("students")
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  workId          String           @unique @map("work_id") @db.VarChar(20)
+  firstName       String           @map("first_name") @db.VarChar(100)
+  lastName        String           @map("last_name") @db.VarChar(100)
+  email           String           @unique @db.VarChar(254)
+  passwordHash    String           @map("password_hash") @db.VarChar(100)
+  role            Role
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  lecturerModules LecturerModule[]
+  classSessions   ClassSession[]
+
+  @@map("users")
+}
+
+/// Which lecturer teaches which module in which semester.
+model LecturerModule {
+  userId     Int      @map("user_id")
+  moduleId   Int      @map("module_id")
+  semesterId Int      @map("semester_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module     Module   @relation(fields: [moduleId], references: [id], onDelete: Restrict)
+  semester   Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
+
+  @@id([userId, moduleId, semesterId])
+  @@index([moduleId, semesterId])
+  @@map("lecturer_modules")
+}
+
+/// Which student takes which module in which semester.
+model Enrollment {
+  studentId  Int      @map("student_id")
+  moduleId   Int      @map("module_id")
+  semesterId Int      @map("semester_id")
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  module     Module   @relation(fields: [moduleId], references: [id], onDelete: Restrict)
+  semester   Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
+
+  @@id([studentId, moduleId, semesterId])
+  @@index([moduleId, semesterId])
+  @@map("enrollments")
+}
+
+// ------------------------------------------------------------- attendance ---
+
+/// One class meeting. `closedAt` is null while the session is open; sessions
+/// never close automatically - only their lecturer closes them.
+model ClassSession {
+  id         Int          @id @default(autoincrement())
+  moduleId   Int          @map("module_id")
+  lecturerId Int          @map("lecturer_id")
+  semesterId Int          @map("semester_id")
+  openedAt   DateTime     @default(now()) @map("opened_at") @db.Timestamptz(6)
+  closedAt   DateTime?    @map("closed_at") @db.Timestamptz(6)
+  module     Module       @relation(fields: [moduleId], references: [id], onDelete: Restrict)
+  lecturer   User         @relation(fields: [lecturerId], references: [id], onDelete: Restrict)
+  semester   Semester     @relation(fields: [semesterId], references: [id], onDelete: Restrict)
+  attendance Attendance[]
+
+  @@index([moduleId, semesterId])
+  @@index([lecturerId])
+  @@map("class_sessions")
+}
+
+/// A student's check-in to a class session. The composite unique constraint
+/// on (session_id, student_id) is the final guarantee against duplicate
+/// check-ins, even when two requests arrive at the same moment.
+model Attendance {
+  id          Int          @id @default(autoincrement())
+  sessionId   Int          @map("session_id")
+  studentId   Int          @map("student_id")
+  checkedInAt DateTime     @default(now()) @map("checked_in_at") @db.Timestamptz(6)
+  session     ClassSession @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  student     Student      @relation(fields: [studentId], references: [id], onDelete: Restrict)
+
+  @@unique([sessionId, studentId], map: "unique_session_student")
+  @@index([studentId])
+  @@map("attendance")
+}
+
+// --------------------------------------------------------- infrastructure ---
+
+/// Server-side login sessions for express-session (connect-pg-simple layout).
+model UserSession {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
+  @@map("session")
+}

@@ -1,0 +1,58 @@
+{
+  "name": "attendance-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Express REST API for the Student Attendance Management System",
+  "author": "Anthony Granston",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "nodemon --watch src --ext js,json src/server.js",
+    "start": "node src/server.js",
+    "test": "vitest run",
+    "test:unit": "SKIP_DB_SETUP=1 vitest run tests/unit",
+    "test:api": "vitest run tests/api",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:reset": "prisma migrate reset --force && node src/db/seed.js",
+    "db:seed": "node src/db/seed.js",
+    "db:import-catalog": "node src/db/catalog/importCatalog.js",
+    "db:check-catalog": "node src/db/catalog/importCatalog.js --check",
+    "db:studio": "prisma studio",
+    "create-admin": "node src/db/createAdmin.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "bcrypt": "^6.0.0",
+    "connect-pg-simple": "^10.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.10",
+    "exceljs": "^4.4.0",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.5",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "pdfkit": "^0.21.0",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "prisma": "^7.10.1",
+    "supertest": "^7.3.2",
+    "vitest": "^5.1.2"
+  },
+  "allowScripts": {
+    "@prisma/engines@7.10.1": true,
+    "prisma@7.10.1": true,
+    "bcrypt": false
+  }
+}
