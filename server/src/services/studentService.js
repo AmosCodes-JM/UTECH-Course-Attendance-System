@@ -21,7 +21,8 @@ async function assertStudentIsNew(idNumber, email, excludeId = undefined) {
 /** Translate a unique-constraint error on students into a friendly 409. */
 export function studentConflictError(err) {
   const target = uniqueViolationTarget(err);
-  if (target.includes('email')) return AppError.conflict('This email address is already registered.', 'DUPLICATE_EMAIL');
+  if (target.includes('email'))
+    return AppError.conflict('This email address is already registered.', 'DUPLICATE_EMAIL');
   return AppError.conflict('A student with this ID number is already registered.', 'DUPLICATE_ID_NUMBER');
 }
 

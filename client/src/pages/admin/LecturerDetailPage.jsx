@@ -17,7 +17,13 @@ const EDIT_FIELDS = [
   { name: 'lastName', label: 'Last name', required: true },
   { name: 'email', label: 'Email', type: 'email', required: true },
   { name: 'workId', label: 'Work ID', required: true },
-  { name: 'password', label: 'New password (optional)', type: 'password', omitIfEmpty: true, hint: 'Leave blank to keep the current password' },
+  {
+    name: 'password',
+    label: 'New password (optional)',
+    type: 'password',
+    omitIfEmpty: true,
+    hint: 'Leave blank to keep the current password',
+  },
 ];
 
 export function LecturerDetailPage() {
@@ -36,8 +42,26 @@ export function LecturerDetailPage() {
 
   const currentSemester = semesters.data?.find((x) => x.isCurrent);
   const assignFields = [
-    { name: 'semesterId', label: 'Semester', type: 'select', numeric: true, required: true, options: (semesters.data ?? []).map((x) => ({ value: x.id, label: `${x.label}${x.isCurrent ? ' (current)' : ''}` })) },
-    { name: 'moduleId', label: 'Module', type: 'select', numeric: true, required: true, placeholder: 'Select a module…', options: (modules.data ?? []).map((m) => ({ value: m.id, label: `${m.code} – ${m.name}` })) },
+    {
+      name: 'semesterId',
+      label: 'Semester',
+      type: 'select',
+      numeric: true,
+      required: true,
+      options: (semesters.data ?? []).map((x) => ({
+        value: x.id,
+        label: `${x.label}${x.isCurrent ? ' (current)' : ''}`,
+      })),
+    },
+    {
+      name: 'moduleId',
+      label: 'Module',
+      type: 'select',
+      numeric: true,
+      required: true,
+      placeholder: 'Select a module…',
+      options: (modules.data ?? []).map((m) => ({ value: m.id, label: `${m.code} – ${m.name}` })),
+    },
   ];
 
   async function save(values) {
@@ -63,8 +87,15 @@ export function LecturerDetailPage() {
         subtitle={`Work ID ${l.workId} · ${l.email}`}
         actions={
           <>
-            <button className="btn btn-secondary" onClick={() => setEditing((v) => !v)}>{editing ? 'Close editor' : 'Edit account'}</button>
-            <DeleteButton title="Delete this lecturer account?" successMessage="Lecturer deleted." onDelete={() => adminApi.lecturers.remove(id)} onDone={() => navigate('/admin/lecturers')}>
+            <button className="btn btn-secondary" onClick={() => setEditing((v) => !v)}>
+              {editing ? 'Close editor' : 'Edit account'}
+            </button>
+            <DeleteButton
+              title="Delete this lecturer account?"
+              successMessage="Lecturer deleted."
+              onDelete={() => adminApi.lecturers.remove(id)}
+              onDone={() => navigate('/admin/lecturers')}
+            >
               Lecturers who have run class sessions cannot be deleted, to keep attendance history intact.
             </DeleteButton>
           </>
@@ -96,13 +127,21 @@ export function LecturerDetailPage() {
                   {l.assignments.map((a) => (
                     <tr key={`${a.semester.id}-${a.module.id}`}>
                       <td className="nowrap">
-                        {a.semester.label} {a.semester.id === currentSemester?.id && <span className="badge badge-open">Current</span>}
+                        {a.semester.label}{' '}
+                        {a.semester.id === currentSemester?.id && <span className="badge badge-open">Current</span>}
                       </td>
                       <td className="mono">{a.module.code}</td>
                       <td>{a.module.name}</td>
                       <td className="actions">
-                        <DeleteButton label="Unassign" title={`Unassign ${a.module.code}?`} successMessage="Course unassigned." onDelete={() => adminApi.assignments.remove(id, a.semester.id, a.module.id)} onDone={lecturer.reload}>
-                          The lecturer will no longer be able to open sessions or view attendance for this course in {a.semester.label}.
+                        <DeleteButton
+                          label="Unassign"
+                          title={`Unassign ${a.module.code}?`}
+                          successMessage="Course unassigned."
+                          onDelete={() => adminApi.assignments.remove(id, a.semester.id, a.module.id)}
+                          onDone={lecturer.reload}
+                        >
+                          The lecturer will no longer be able to open sessions or view attendance for this course in{' '}
+                          {a.semester.label}.
                         </DeleteButton>
                       </td>
                     </tr>
@@ -115,7 +154,14 @@ export function LecturerDetailPage() {
         <aside className="card">
           <h2>Assign a course</h2>
           {semesters.data && modules.data && (
-            <SimpleForm key={l.assignments.length} fields={assignFields} columns={1} initialValues={{ semesterId: currentSemester?.id ?? '' }} submitLabel="Assign course" onSubmit={assign} />
+            <SimpleForm
+              key={l.assignments.length}
+              fields={assignFields}
+              columns={1}
+              initialValues={{ semesterId: currentSemester?.id ?? '' }}
+              submitLabel="Assign course"
+              onSubmit={assign}
+            />
           )}
         </aside>
       </div>

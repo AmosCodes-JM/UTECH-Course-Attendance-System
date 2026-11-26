@@ -29,12 +29,21 @@ export function LecturersPage() {
       <PageHeader
         title="Lecturers"
         subtitle="Lecturer accounts and their course assignments. Passwords are never shown."
-        actions={<button className="btn btn-primary" onClick={() => setCreating(true)}>Add lecturer</button>}
+        actions={
+          <button className="btn btn-primary" onClick={() => setCreating(true)}>
+            Add lecturer
+          </button>
+        }
       />
       {creating && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <h2>New lecturer account</h2>
-          <SimpleForm fields={ACCOUNT_FIELDS} onSubmit={create} onCancel={() => setCreating(false)} submitLabel="Create account" />
+          <SimpleForm
+            fields={ACCOUNT_FIELDS}
+            onSubmit={create}
+            onCancel={() => setCreating(false)}
+            submitLabel="Create account"
+          />
         </div>
       )}
       {loading && <LoadingBlock />}
@@ -56,11 +65,15 @@ export function LecturersPage() {
               {data.map((l) => (
                 <tr key={l.id}>
                   <td className="mono">{l.workId}</td>
-                  <td>{l.firstName} {l.lastName}</td>
+                  <td>
+                    {l.firstName} {l.lastName}
+                  </td>
                   <td>{l.email}</td>
                   <td>{l.currentCourseCount}</td>
                   <td className="actions">
-                    <Link className="btn btn-secondary btn-sm" to={`/admin/lecturers/${l.id}`}>Manage</Link>
+                    <Link className="btn btn-secondary btn-sm" to={`/admin/lecturers/${l.id}`}>
+                      Manage
+                    </Link>
                   </td>
                 </tr>
               ))}

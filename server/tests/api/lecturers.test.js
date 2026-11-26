@@ -57,28 +57,38 @@ describe('POST /api/lecturers (registration)', () => {
   });
 
   it('rejects a duplicate work ID and a duplicate email', async () => {
-    const dupWork = await request(app).post('/api/lecturers').send(registration({ workId: 'LEC001' }));
+    const dupWork = await request(app)
+      .post('/api/lecturers')
+      .send(registration({ workId: 'LEC001' }));
     expect(dupWork.status).toBe(409);
     expect(dupWork.body.code).toBe('DUPLICATE_WORK_ID');
-    const dupEmail = await request(app).post('/api/lecturers').send(registration({ email: 'LECTURER1@test.example' }));
+    const dupEmail = await request(app)
+      .post('/api/lecturers')
+      .send(registration({ email: 'LECTURER1@test.example' }));
     expect(dupEmail.status).toBe(409);
     expect(dupEmail.body.code).toBe('DUPLICATE_EMAIL');
   });
 
   it('rejects courses not offered by the selected programmes this semester', async () => {
-    const res = await request(app).post('/api/lecturers').send(registration({ moduleIds: [fx.modules.CMP1025.id] }));
+    const res = await request(app)
+      .post('/api/lecturers')
+      .send(registration({ moduleIds: [fx.modules.CMP1025.id] }));
     expect(res.status).toBe(400);
     expect(res.body.code).toBe('MODULE_NOT_OFFERED');
   });
 
   it('cannot be used to create an administrator', async () => {
-    const res = await request(app).post('/api/lecturers').send({ ...registration(), role: 'ADMIN' });
+    const res = await request(app)
+      .post('/api/lecturers')
+      .send({ ...registration(), role: 'ADMIN' });
     expect(res.status).toBe(400);
     expect(await prisma.user.count({ where: { role: 'ADMIN' } })).toBe(1);
   });
 
   it('enforces the password policy', async () => {
-    const res = await request(app).post('/api/lecturers').send(registration({ password: 'short' }));
+    const res = await request(app)
+      .post('/api/lecturers')
+      .send(registration({ password: 'short' }));
     expect(res.status).toBe(400);
     expect(res.body.errors[0].field).toBe('password');
   });
@@ -86,7 +96,9 @@ describe('POST /api/lecturers (registration)', () => {
 
 describe('POST /api/auth/lecturer/login', () => {
   it('signs in with email or work ID and sets an HTTP-only session cookie', async () => {
-    const byEmail = await request(app).post('/api/auth/lecturer/login').send({ identifier: 'Lecturer1@Test.Example', password: 'Password123' });
+    const byEmail = await request(app)
+      .post('/api/auth/lecturer/login')
+      .send({ identifier: 'Lecturer1@Test.Example', password: 'Password123' });
     expect(byEmail.status).toBe(200);
     expect(byEmail.body.data).toMatchObject({ user: { workId: 'LEC001', role: 'LECTURER' }, redirectTo: '/lecturer' });
     expect(byEmail.body.data.csrfToken).toMatch(/^[a-f0-9]{64}$/);
@@ -94,13 +106,19 @@ describe('POST /api/auth/lecturer/login', () => {
     expect(cookie).toMatch(/HttpOnly/);
     expect(cookie).toMatch(/SameSite=Lax/);
 
-    const byWorkId = await request(app).post('/api/auth/lecturer/login').send({ identifier: 'lec001', password: 'Password123' });
+    const byWorkId = await request(app)
+      .post('/api/auth/lecturer/login')
+      .send({ identifier: 'lec001', password: 'Password123' });
     expect(byWorkId.status).toBe(200);
   });
 
   it('rejects a wrong password or unknown account with the same generic message', async () => {
-    const wrong = await request(app).post('/api/auth/lecturer/login').send({ identifier: 'LEC001', password: 'Nope12345' });
-    const unknown = await request(app).post('/api/auth/lecturer/login').send({ identifier: 'ghost@test.example', password: 'Nope12345' });
+    const wrong = await request(app)
+      .post('/api/auth/lecturer/login')
+      .send({ identifier: 'LEC001', password: 'Nope12345' });
+    const unknown = await request(app)
+      .post('/api/auth/lecturer/login')
+      .send({ identifier: 'ghost@test.example', password: 'Nope12345' });
     expect(wrong.status).toBe(401);
     expect(unknown.status).toBe(401);
     expect(wrong.body.message).toBe(unknown.body.message);
@@ -131,17 +149,26 @@ describe('lecturer courses and sessions', () => {
     const res = await agent.get('/api/lecturer/courses');
     expect(res.status).toBe(200);
     expect(res.body.data.courses.map((c) => c.code)).toEqual(['CIT2004', 'PRJ4020']);
-    expect(res.body.data.courses[0]).toMatchObject({ openSession: null, programs: ['BSc Computing – Computer Science'] });
+    expect(res.body.data.courses[0]).toMatchObject({
+      openSession: null,
+      programs: ['BSc Computing – Computer Science'],
+    });
   });
 
   it('opens a session (server timestamp) and refuses a second open session for the same course', async () => {
     const { agent, csrf } = await login(app, 'lecturer', 'LEC001');
-    const open = await agent.post('/api/class-sessions').set('X-CSRF-Token', csrf).send({ moduleId: fx.modules.CIT2004.id });
+    const open = await agent
+      .post('/api/class-sessions')
+      .set('X-CSRF-Token', csrf)
+      .send({ moduleId: fx.modules.CIT2004.id });
     expect(open.status).toBe(201);
     expect(open.body.data).toMatchObject({ isOpen: true, closedAt: null, module: { code: 'CIT2004' } });
     expect(Math.abs(new Date(open.body.data.openedAt).getTime() - Date.now())).toBeLessThan(5000);
 
-    const again = await agent.post('/api/class-sessions').set('X-CSRF-Token', csrf).send({ moduleId: fx.modules.CIT2004.id });
+    const again = await agent
+      .post('/api/class-sessions')
+      .set('X-CSRF-Token', csrf)
+      .send({ moduleId: fx.modules.CIT2004.id });
     expect(again.status).toBe(409);
     expect(again.body.code).toBe('SESSION_ALREADY_OPEN');
 
@@ -163,14 +190,20 @@ describe('lecturer courses and sessions', () => {
 
   it('sessions stay open until closed (no automatic closing)', async () => {
     const session = await openSessionInDb(fx.users.lecturer1, fx.modules.CIT2004, fx.semesters.current);
-    await prisma.classSession.update({ where: { id: session.id }, data: { openedAt: new Date(Date.now() - 3 * 24 * 3600 * 1000) } });
+    await prisma.classSession.update({
+      where: { id: session.id },
+      data: { openedAt: new Date(Date.now() - 3 * 24 * 3600 * 1000) },
+    });
     const res = await request(app).get(`/api/students/${fx.students.s1.idNumber}/open-courses`);
     expect(res.body.data.courses.map((c) => c.sessionId)).toContain(session.id);
   });
 
   it('cannot open a session for another lecturer’s course', async () => {
     const { agent, csrf } = await login(app, 'lecturer', 'LEC002');
-    const res = await agent.post('/api/class-sessions').set('X-CSRF-Token', csrf).send({ moduleId: fx.modules.CIT2004.id });
+    const res = await agent
+      .post('/api/class-sessions')
+      .set('X-CSRF-Token', csrf)
+      .send({ moduleId: fx.modules.CIT2004.id });
     expect(res.status).toBe(403);
     expect(res.body.code).toBe('NOT_YOUR_COURSE');
   });
@@ -186,7 +219,9 @@ describe('lecturer courses and sessions', () => {
 
   it('cannot close a session for a module that is no longer assigned to them', async () => {
     const session = await openSessionInDb(fx.users.lecturer1, fx.modules.CIT2004, fx.semesters.current);
-    await prisma.lecturerModule.deleteMany({ where: { userId: fx.users.lecturer1.id, moduleId: fx.modules.CIT2004.id } });
+    await prisma.lecturerModule.deleteMany({
+      where: { userId: fx.users.lecturer1.id, moduleId: fx.modules.CIT2004.id },
+    });
     const { agent, csrf } = await login(app, 'lecturer', 'LEC001');
     expect((await agent.patch(`/api/class-sessions/${session.id}/close`).set('X-CSRF-Token', csrf)).status).toBe(403);
   });
@@ -274,6 +309,8 @@ describe('attendance viewing and exports', () => {
     const other = await login(app, 'lecturer', 'LEC002');
     expect((await other.agent.get(url)).status).toBe(403);
     const own = await login(app, 'lecturer', 'LEC001');
-    expect((await own.agent.get(`/api/attendance/export?format=csv&moduleId=${fx.modules.CIT2004.id}`)).status).toBe(400);
+    expect((await own.agent.get(`/api/attendance/export?format=csv&moduleId=${fx.modules.CIT2004.id}`)).status).toBe(
+      400,
+    );
   });
 });

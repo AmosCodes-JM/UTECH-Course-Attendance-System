@@ -37,7 +37,10 @@ export async function checkIn({ idNumber, sessionId }) {
 
       if (!session) throw AppError.notFound('That class session does not exist.', 'SESSION_NOT_FOUND');
       if (session.closed_at !== null) {
-        throw AppError.conflict('This class session has been closed. Check-in is no longer possible.', 'SESSION_CLOSED');
+        throw AppError.conflict(
+          'This class session has been closed. Check-in is no longer possible.',
+          'SESSION_CLOSED',
+        );
       }
 
       const enrollment = await tx.enrollment.findUnique({

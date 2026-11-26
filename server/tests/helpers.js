@@ -62,9 +62,15 @@ export async function createFixtures() {
     },
   });
 
-  const school = await prisma.school.create({ data: { code: 'SCIT', name: 'School of Computing & Information Technology' } });
-  const cs = await prisma.program.create({ data: { schoolId: school.id, name: 'BSc Computing', major: 'Computer Science' } });
-  const it = await prisma.program.create({ data: { schoolId: school.id, name: 'BSc Computing', major: 'Information Technology' } });
+  const school = await prisma.school.create({
+    data: { code: 'SCIT', name: 'School of Computing & Information Technology' },
+  });
+  const cs = await prisma.program.create({
+    data: { schoolId: school.id, name: 'BSc Computing', major: 'Computer Science' },
+  });
+  const it = await prisma.program.create({
+    data: { schoolId: school.id, name: 'BSc Computing', major: 'Information Technology' },
+  });
 
   const mod = async (code, name, credits) => prisma.module.create({ data: { code, name, credits } });
   const modules = {
@@ -104,10 +110,22 @@ export async function createFixtures() {
   });
 
   const s1 = await prisma.student.create({
-    data: { idNumber: '1900001', firstName: 'Stu', lastName: 'Dent', email: 's1@students.test.example', programId: cs.id },
+    data: {
+      idNumber: '1900001',
+      firstName: 'Stu',
+      lastName: 'Dent',
+      email: 's1@students.test.example',
+      programId: cs.id,
+    },
   });
   const s2 = await prisma.student.create({
-    data: { idNumber: '1900002', firstName: 'Sue', lastName: 'Second', email: 's2@students.test.example', programId: cs.id },
+    data: {
+      idNumber: '1900002',
+      firstName: 'Sue',
+      lastName: 'Second',
+      email: 's2@students.test.example',
+      programId: cs.id,
+    },
   });
   await prisma.enrollment.createMany({
     data: [
@@ -118,7 +136,14 @@ export async function createFixtures() {
     ],
   });
 
-  return { semesters: { current, next }, school, programs: { cs, it }, modules, users: { admin, lecturer1, lecturer2 }, students: { s1, s2 } };
+  return {
+    semesters: { current, next },
+    school,
+    programs: { cs, it },
+    modules,
+    users: { admin, lecturer1, lecturer2 },
+    students: { s1, s2 },
+  };
 }
 
 /** A fresh Express app per test file (fresh in-memory rate-limit counters). */
@@ -139,5 +164,7 @@ export async function login(app, portal, identifier, password = PASSWORD) {
 
 /** Open a class session directly in the database (test shortcut). */
 export function openSessionInDb(lecturer, module, semester) {
-  return prisma.classSession.create({ data: { lecturerId: lecturer.id, moduleId: module.id, semesterId: semester.id } });
+  return prisma.classSession.create({
+    data: { lecturerId: lecturer.id, moduleId: module.id, semesterId: semester.id },
+  });
 }

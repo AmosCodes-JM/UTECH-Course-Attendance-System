@@ -20,7 +20,11 @@ export function validate(schemas) {
       if (!schemas[part]) continue;
       const result = schemas[part].safeParse(req[part] ?? {});
       if (!result.success) {
-        throw AppError.badRequest('Some of the information sent is invalid.', 'VALIDATION_ERROR', formatIssues(result.error));
+        throw AppError.badRequest(
+          'Some of the information sent is invalid.',
+          'VALIDATION_ERROR',
+          formatIssues(result.error),
+        );
       }
       validated[part] = result.data;
     }

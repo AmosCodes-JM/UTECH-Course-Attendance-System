@@ -33,12 +33,22 @@ export function SchoolsPage() {
       <PageHeader
         title="Schools"
         subtitle="Top level of the academic catalog."
-        actions={<button className="btn btn-primary" onClick={() => setEditing('new')}>Add school</button>}
+        actions={
+          <button className="btn btn-primary" onClick={() => setEditing('new')}>
+            Add school
+          </button>
+        }
       />
       {editing && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <h2>{editing === 'new' ? 'New school' : `Edit ${editing.code}`}</h2>
-          <SimpleForm key={editing.id ?? 'new'} fields={FIELDS} initialValues={editing === 'new' ? {} : editing} onSubmit={save} onCancel={() => setEditing(null)} />
+          <SimpleForm
+            key={editing.id ?? 'new'}
+            fields={FIELDS}
+            initialValues={editing === 'new' ? {} : editing}
+            onSubmit={save}
+            onCancel={() => setEditing(null)}
+          />
         </div>
       )}
       {loading && <LoadingBlock />}
@@ -61,8 +71,14 @@ export function SchoolsPage() {
                   <td>{s.name}</td>
                   <td>{s.programCount}</td>
                   <td className="actions">
-                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(s)}>Edit</button>
-                    <DeleteButton title={`Delete ${s.code}?`} onDelete={() => adminApi.schools.remove(s.id)} onDone={reload}>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(s)}>
+                      Edit
+                    </button>
+                    <DeleteButton
+                      title={`Delete ${s.code}?`}
+                      onDelete={() => adminApi.schools.remove(s.id)}
+                      onDone={reload}
+                    >
                       A school can only be deleted when it has no programmes.
                     </DeleteButton>
                   </td>

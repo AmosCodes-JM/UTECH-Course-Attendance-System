@@ -22,7 +22,9 @@ export function serializeProgram(program) {
     name: program.name,
     major: program.major,
     displayName: programDisplayName(program),
-    school: program.school ? { id: program.school.id, code: program.school.code, name: program.school.name } : undefined,
+    school: program.school
+      ? { id: program.school.id, code: program.school.code, name: program.school.name }
+      : undefined,
   };
 }
 

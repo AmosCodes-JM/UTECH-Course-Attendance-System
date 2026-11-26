@@ -4,7 +4,16 @@ import { useEffect, useRef } from 'react';
  * Accessible confirmation prompt built on the native <dialog> element.
  * Used before important actions such as closing a session or deleting data.
  */
-export function ConfirmDialog({ open, title, children, confirmLabel = 'Confirm', tone = 'primary', busy, onConfirm, onCancel }) {
+export function ConfirmDialog({
+  open,
+  title,
+  children,
+  confirmLabel = 'Confirm',
+  tone = 'primary',
+  busy,
+  onConfirm,
+  onCancel,
+}) {
   const ref = useRef(null);
 
   useEffect(() => {

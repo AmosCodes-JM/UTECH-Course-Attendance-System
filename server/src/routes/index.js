@@ -4,11 +4,7 @@ import { createAdminRouter } from './adminRoutes.js';
 import { createAttendanceRouter } from './attendanceRoutes.js';
 import { createAuthRouter } from './authRoutes.js';
 import { createProgramRouter, createSemesterRouter } from './catalogRoutes.js';
-import {
-  createClassSessionRouter,
-  createLecturerRegistrationRouter,
-  createLecturerRouter,
-} from './lecturerRoutes.js';
+import { createClassSessionRouter, createLecturerRegistrationRouter, createLecturerRouter } from './lecturerRoutes.js';
 import { createStudentRouter } from './studentRoutes.js';
 
 export function createApiRouter(limiters) {

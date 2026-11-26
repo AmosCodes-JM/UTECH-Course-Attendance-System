@@ -21,10 +21,20 @@ export function ExportButtons({ moduleId, date, disabled }) {
 
   return (
     <div className="btn-row">
-      <button type="button" className="btn btn-secondary" onClick={() => exportAs('xlsx')} disabled={disabled || busy !== null}>
+      <button
+        type="button"
+        className="btn btn-secondary"
+        onClick={() => exportAs('xlsx')}
+        disabled={disabled || busy !== null}
+      >
         {busy === 'xlsx' ? <Spinner label="Preparing Excel file" /> : '⬇'} Excel (.xlsx)
       </button>
-      <button type="button" className="btn btn-secondary" onClick={() => exportAs('pdf')} disabled={disabled || busy !== null}>
+      <button
+        type="button"
+        className="btn btn-secondary"
+        onClick={() => exportAs('pdf')}
+        disabled={disabled || busy !== null}
+      >
         {busy === 'pdf' ? <Spinner label="Preparing PDF" /> : '⬇'} PDF
       </button>
     </div>

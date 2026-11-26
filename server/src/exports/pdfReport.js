@@ -86,7 +86,10 @@ export function writeAttendancePdf(report, lecturerName, stream) {
       doc.addPage();
       y = doc.page.margins.top;
     }
-    doc.font('Helvetica-Bold').fontSize(11).text(`Total attendance: ${report.total}`, doc.page.margins.left, y + 12);
+    doc
+      .font('Helvetica-Bold')
+      .fontSize(11)
+      .text(`Total attendance: ${report.total}`, doc.page.margins.left, y + 12);
     doc.end();
   });
 }

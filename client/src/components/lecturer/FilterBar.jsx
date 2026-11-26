@@ -28,7 +28,12 @@ export function FilterBar({ courses, moduleId, date, onChange }) {
           onChange={(e) => onChange({ moduleId, date: e.target.value || null })}
         />
       </div>
-      <button type="button" className="btn btn-secondary" onClick={() => onChange({ moduleId, date: null })} disabled={!date}>
+      <button
+        type="button"
+        className="btn btn-secondary"
+        onClick={() => onChange({ moduleId, date: null })}
+        disabled={!date}
+      >
         All dates
       </button>
     </div>

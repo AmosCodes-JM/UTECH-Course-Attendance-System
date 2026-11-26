@@ -61,9 +61,7 @@ export function me(req, res) {
  */
 export async function sessionStatus(req, res) {
   const sessionUser = req.session?.user;
-  const user = sessionUser
-    ? await prisma.user.findUnique({ where: { id: sessionUser.id } })
-    : null;
+  const user = sessionUser ? await prisma.user.findUnique({ where: { id: sessionUser.id } }) : null;
 
   if (!user || user.role !== sessionUser.role) {
     if (sessionUser) await endSession(req, res);

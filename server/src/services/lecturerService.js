@@ -13,12 +13,14 @@ export async function assertUserIsNew(email, workId, excludeId = undefined) {
     select: { email: true, workId: true },
   });
   if (existing?.workId === workId) throw AppError.conflict('This work ID is already registered.', 'DUPLICATE_WORK_ID');
-  if (existing?.email === email) throw AppError.conflict('This email address is already registered.', 'DUPLICATE_EMAIL');
+  if (existing?.email === email)
+    throw AppError.conflict('This email address is already registered.', 'DUPLICATE_EMAIL');
 }
 
 export function userConflictError(err) {
   const target = uniqueViolationTarget(err);
-  if (target.includes('email')) return AppError.conflict('This email address is already registered.', 'DUPLICATE_EMAIL');
+  if (target.includes('email'))
+    return AppError.conflict('This email address is already registered.', 'DUPLICATE_EMAIL');
   return AppError.conflict('This work ID is already registered.', 'DUPLICATE_WORK_ID');
 }
 
@@ -103,9 +105,7 @@ export async function getLecturerCourses(userId, scope = 'current') {
       ...serializeModule(a.module),
       programs: [...new Set(a.module.programModules.map((pm) => programDisplayName(pm.program)))].sort(),
       semester: serializeSemester(a.semester),
-      openSession: open
-        ? { id: open.id, openedAt: open.openedAt, attendanceCount: open._count.attendance }
-        : null,
+      openSession: open ? { id: open.id, openedAt: open.openedAt, attendanceCount: open._count.attendance } : null,
     });
   }
 
@@ -121,7 +121,10 @@ export async function openSession(userId, moduleId) {
     where: { lecturerId: userId, moduleId, semesterId: semester.id, closedAt: null },
   });
   if (existing) {
-    throw AppError.conflict('You already have an open session for this course. Close it before opening another.', 'SESSION_ALREADY_OPEN');
+    throw AppError.conflict(
+      'You already have an open session for this course. Close it before opening another.',
+      'SESSION_ALREADY_OPEN',
+    );
   }
 
   try {

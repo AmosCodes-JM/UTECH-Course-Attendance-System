@@ -17,7 +17,15 @@ describe('password hashing (bcrypt)', () => {
   });
 
   it('never exposes the password hash in API user objects', () => {
-    const shaped = serializeUser({ id: 1, workId: 'L1', firstName: 'A', lastName: 'B', email: 'a@b.c', role: 'LECTURER', passwordHash: 'x' });
+    const shaped = serializeUser({
+      id: 1,
+      workId: 'L1',
+      firstName: 'A',
+      lastName: 'B',
+      email: 'a@b.c',
+      role: 'LECTURER',
+      passwordHash: 'x',
+    });
     expect(shaped).not.toHaveProperty('passwordHash');
   });
 });

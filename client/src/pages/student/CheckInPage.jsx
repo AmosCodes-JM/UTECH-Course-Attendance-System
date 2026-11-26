@@ -22,11 +22,20 @@ const RESET_AFTER_IDLE_MS = 60_000; // privacy: clear a forgotten screen
 function describeCheckInError(error) {
   switch (error.code) {
     case 'ALREADY_CHECKED_IN':
-      return { title: 'Already checked in', message: 'Your attendance for this session was already recorded. You do not need to check in again.' };
+      return {
+        title: 'Already checked in',
+        message: 'Your attendance for this session was already recorded. You do not need to check in again.',
+      };
     case 'SESSION_CLOSED':
-      return { title: 'Session closed', message: 'Your lecturer has closed this session, so check-in is no longer possible.' };
+      return {
+        title: 'Session closed',
+        message: 'Your lecturer has closed this session, so check-in is no longer possible.',
+      };
     case 'NOT_ENROLLED':
-      return { title: 'Not enrolled', message: 'You are not enrolled in this course. Speak to your lecturer or the SCIT office.' };
+      return {
+        title: 'Not enrolled',
+        message: 'You are not enrolled in this course. Speak to your lecturer or the SCIT office.',
+      };
     case 'SESSION_NOT_FOUND':
       return { title: 'Session not found', message: 'This class session no longer exists. Please try again.' };
     case 'RATE_LIMITED':
@@ -162,8 +171,13 @@ export function CheckInPage() {
               </Alert>
             )}
             {lookupError && !notFound && (
-              <Alert type="error" title={lookupError.code === 'VALIDATION_ERROR' ? 'Invalid ID number' : 'Could not look up your ID'}>
-                {lookupError.code === 'VALIDATION_ERROR' ? 'Student IDs use 4–20 letters or digits.' : lookupError.message}
+              <Alert
+                type="error"
+                title={lookupError.code === 'VALIDATION_ERROR' ? 'Invalid ID number' : 'Could not look up your ID'}
+              >
+                {lookupError.code === 'VALIDATION_ERROR'
+                  ? 'Student IDs use 4–20 letters or digits.'
+                  : lookupError.message}
               </Alert>
             )}
             <div style={{ marginTop: '1.25rem' }}>
@@ -187,7 +201,8 @@ export function CheckInPage() {
             )}
             {courses.length === 0 ? (
               <Alert type="info" title="No open sessions right now">
-                None of your courses has an open attendance session. Ask your lecturer to open the session, then try again.
+                None of your courses has an open attendance session. Ask your lecturer to open the session, then try
+                again.
               </Alert>
             ) : (
               <>

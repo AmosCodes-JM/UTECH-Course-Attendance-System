@@ -5,12 +5,7 @@
 // 23514 = check_violation, 23P01 = exclusion_violation.
 
 function pgCode(err) {
-  return (
-    err?.meta?.code ??
-    err?.meta?.driverAdapterError?.cause?.originalCode ??
-    err?.cause?.code ??
-    err?.code
-  );
+  return err?.meta?.code ?? err?.meta?.driverAdapterError?.cause?.originalCode ?? err?.cause?.code ?? err?.code;
 }
 
 export function isUniqueViolation(err) {

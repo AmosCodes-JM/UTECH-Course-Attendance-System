@@ -44,12 +44,23 @@ export function ProgramsPage() {
       <PageHeader
         title="Programmes"
         subtitle="Programmes and the modules they offer (from the SCIT diet sheets)."
-        actions={<button className="btn btn-primary" onClick={() => setEditing('new')} disabled={!schools.data}>Add programme</button>}
+        actions={
+          <button className="btn btn-primary" onClick={() => setEditing('new')} disabled={!schools.data}>
+            Add programme
+          </button>
+        }
       />
       {editing && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <h2>{editing === 'new' ? 'New programme' : `Edit ${editing.displayName}`}</h2>
-          <SimpleForm key={editing.id ?? 'new'} fields={fields} columns={3} initialValues={editing === 'new' ? {} : editing} onSubmit={save} onCancel={() => setEditing(null)} />
+          <SimpleForm
+            key={editing.id ?? 'new'}
+            fields={fields}
+            columns={3}
+            initialValues={editing === 'new' ? {} : editing}
+            onSubmit={save}
+            onCancel={() => setEditing(null)}
+          />
         </div>
       )}
       {programs.loading && <LoadingBlock />}
@@ -76,10 +87,19 @@ export function ProgramsPage() {
                   <td>{p.moduleCount}</td>
                   <td>{p.studentCount}</td>
                   <td className="actions">
-                    <Link className="btn btn-secondary btn-sm" to={`/admin/programs/${p.id}`}>Modules</Link>
-                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(p)}>Edit</button>
-                    <DeleteButton title={`Delete ${p.displayName}?`} onDelete={() => adminApi.programs.remove(p.id)} onDone={programs.reload}>
-                      Its module assignments are removed too (the modules themselves stay). Programmes with registered students cannot be deleted.
+                    <Link className="btn btn-secondary btn-sm" to={`/admin/programs/${p.id}`}>
+                      Modules
+                    </Link>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(p)}>
+                      Edit
+                    </button>
+                    <DeleteButton
+                      title={`Delete ${p.displayName}?`}
+                      onDelete={() => adminApi.programs.remove(p.id)}
+                      onDone={programs.reload}
+                    >
+                      Its module assignments are removed too (the modules themselves stay). Programmes with registered
+                      students cannot be deleted.
                     </DeleteButton>
                   </td>
                 </tr>

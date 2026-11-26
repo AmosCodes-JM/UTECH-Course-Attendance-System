@@ -7,7 +7,13 @@ const semesters = [
   { id: 1, academicYear: '2026/2027', term: 1, startDate: '2026-09-01', endDate: '2026-12-31' },
   { id: 2, academicYear: '2026/2027', term: 2, startDate: '2027-01-01', endDate: '2027-05-31' },
   // Prisma returns DATE columns as Date objects - both forms must work.
-  { id: 3, academicYear: '2027/2028', term: 1, startDate: new Date('2027-09-01T00:00:00Z'), endDate: new Date('2027-12-31T00:00:00Z') },
+  {
+    id: 3,
+    academicYear: '2027/2028',
+    term: 1,
+    startDate: new Date('2027-09-01T00:00:00Z'),
+    endDate: new Date('2027-12-31T00:00:00Z'),
+  },
 ];
 
 describe('current semester determination', () => {

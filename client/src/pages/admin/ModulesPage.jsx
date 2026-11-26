@@ -38,16 +38,39 @@ export function ModulesPage() {
     <>
       <PageHeader
         title="Modules"
-        subtitle={data ? `${data.length} modules in the catalog. Each module is stored once, even when several programmes share it.` : 'Module catalog'}
-        actions={<button className="btn btn-primary" onClick={() => setEditing('new')}>Add module</button>}
+        subtitle={
+          data
+            ? `${data.length} modules in the catalog. Each module is stored once, even when several programmes share it.`
+            : 'Module catalog'
+        }
+        actions={
+          <button className="btn btn-primary" onClick={() => setEditing('new')}>
+            Add module
+          </button>
+        }
       />
       {editing && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <h2>{editing === 'new' ? 'New module' : `Edit ${editing.code}`}</h2>
-          <SimpleForm key={editing.id ?? 'new'} fields={FIELDS} columns={3} initialValues={editing === 'new' ? {} : editing} onSubmit={save} onCancel={() => setEditing(null)} />
+          <SimpleForm
+            key={editing.id ?? 'new'}
+            fields={FIELDS}
+            columns={3}
+            initialValues={editing === 'new' ? {} : editing}
+            onSubmit={save}
+            onCancel={() => setEditing(null)}
+          />
         </div>
       )}
-      <input className="input" style={{ maxWidth: 360, marginBottom: '0.75rem' }} type="search" placeholder="Search by code or name" aria-label="Search modules" value={search} onChange={(e) => setSearch(e.target.value)} />
+      <input
+        className="input"
+        style={{ maxWidth: 360, marginBottom: '0.75rem' }}
+        type="search"
+        placeholder="Search by code or name"
+        aria-label="Search modules"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
       {loading && <LoadingBlock />}
       {error && <ErrorAlert error={error} />}
       {data && (
@@ -69,11 +92,21 @@ export function ModulesPage() {
                   <td>{m.name}</td>
                   <td className="nowrap">{creditsLabel(m.credits)}</td>
                   <td title={m.programs.map((p) => p.displayName).join('\n')}>
-                    {m.programs.length === 0 ? <span className="muted">None</span> : `${m.programs.length} programme${m.programs.length === 1 ? '' : 's'}`}
+                    {m.programs.length === 0 ? (
+                      <span className="muted">None</span>
+                    ) : (
+                      `${m.programs.length} programme${m.programs.length === 1 ? '' : 's'}`
+                    )}
                   </td>
                   <td className="actions">
-                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(m)}>Edit</button>
-                    <DeleteButton title={`Delete ${m.code}?`} onDelete={() => adminApi.modules.remove(m.id)} onDone={reload}>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(m)}>
+                      Edit
+                    </button>
+                    <DeleteButton
+                      title={`Delete ${m.code}?`}
+                      onDelete={() => adminApi.modules.remove(m.id)}
+                      onDone={reload}
+                    >
                       Modules with enrollments, lecturer assignments or class sessions cannot be deleted.
                     </DeleteButton>
                   </td>

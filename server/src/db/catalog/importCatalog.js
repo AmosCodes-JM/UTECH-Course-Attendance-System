@@ -47,9 +47,15 @@ export function resolveCatalog(catalog) {
       const list = sightings.get(code) ?? [];
       list.push({ name, credits });
       sightings.set(code, list);
-      if (!byCode.has(code)) byCode.set(code, { code, level, semesterSlot: SLOT[slot], choiceGroup: choiceGroup ?? null });
+      if (!byCode.has(code))
+        byCode.set(code, { code, level, semesterSlot: SLOT[slot], choiceGroup: choiceGroup ?? null });
     }
-    programs.push({ name: program.name, major: program.major ?? null, source: program.source, modules: [...byCode.values()] });
+    programs.push({
+      name: program.name,
+      major: program.major ?? null,
+      source: program.source,
+      modules: [...byCode.values()],
+    });
   }
 
   const modules = [];
@@ -65,7 +71,9 @@ export function resolveCatalog(catalog) {
     // Credits: override, otherwise all sheets that list credits must agree.
     const creditValues = [...new Set(seen.map((s) => s.credits).filter((c) => c !== null && c !== undefined))];
     if (override.credits === undefined && creditValues.length > 1) {
-      problems.push(`${code}: diet sheets disagree on credits (${creditValues.join(' vs ')}) - add a moduleOverrides entry`);
+      problems.push(
+        `${code}: diet sheets disagree on credits (${creditValues.join(' vs ')}) - add a moduleOverrides entry`,
+      );
     }
 
     modules.push({
@@ -119,8 +127,15 @@ export async function importCatalog(prisma, catalog = loadCatalog(), { log = con
         }
       }
 
-      const summary = { school: school.code, programs: resolved.programs.length, modules: resolved.modules.length, programModules: links };
-      log(`Catalog imported: ${summary.programs} programmes, ${summary.modules} modules, ${summary.programModules} programme-module links.`);
+      const summary = {
+        school: school.code,
+        programs: resolved.programs.length,
+        modules: resolved.modules.length,
+        programModules: links,
+      };
+      log(
+        `Catalog imported: ${summary.programs} programmes, ${summary.modules} modules, ${summary.programModules} programme-module links.`,
+      );
       return summary;
     },
     { timeout: 120_000, maxWait: 10_000 },
@@ -133,7 +148,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   if (process.argv.includes('--check')) {
     const r = resolveCatalog(catalog);
     console.log(`Catalog OK: ${r.programs.length} programmes, ${r.modules.length} modules.`);
-    for (const p of r.programs) console.log(`  - ${p.name}${p.major ? ` – ${p.major}` : ''}: ${p.modules.length} modules`);
+    for (const p of r.programs)
+      console.log(`  - ${p.name}${p.major ? ` – ${p.major}` : ''}: ${p.modules.length} modules`);
   } else {
     const { prisma, disconnectDatabase } = await import('../client.js');
     try {

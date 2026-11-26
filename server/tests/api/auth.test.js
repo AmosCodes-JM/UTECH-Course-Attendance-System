@@ -110,7 +110,9 @@ describe('role separation', () => {
 
 describe('sessions', () => {
   it('rejects forged or unknown session cookies', async () => {
-    const res = await request(app).get('/api/lecturer/courses').set('Cookie', 'sams.sid=s%3Afake-session-id.invalidsignature');
+    const res = await request(app)
+      .get('/api/lecturer/courses')
+      .set('Cookie', 'sams.sid=s%3Afake-session-id.invalidsignature');
     expect(res.status).toBe(401);
   });
 
@@ -130,7 +132,9 @@ describe('sessions', () => {
   });
 
   it('logout invalidates the server-side session, not just the browser cookie', async () => {
-    const res = await request(app).post('/api/auth/lecturer/login').send({ identifier: 'LEC001', password: 'Password123' });
+    const res = await request(app)
+      .post('/api/auth/lecturer/login')
+      .send({ identifier: 'LEC001', password: 'Password123' });
     const cookie = sessionCookie(res);
     const csrf = res.body.data.csrfToken;
 
@@ -155,7 +159,9 @@ describe('sessions', () => {
 describe('identity always comes from the session', () => {
   it('ignores a lecturer ID supplied in the query string', async () => {
     const { agent } = await login(app, 'lecturer', 'LEC002');
-    const res = await agent.get(`/api/attendance?moduleId=${fx.modules.CIT2004.id}&lecturerId=${fx.users.lecturer1.id}`);
+    const res = await agent.get(
+      `/api/attendance?moduleId=${fx.modules.CIT2004.id}&lecturerId=${fx.users.lecturer1.id}`,
+    );
     expect(res.status).toBe(403);
   });
 
@@ -206,8 +212,15 @@ describe('CSRF and origin protection', () => {
 
 describe('rate limiting', () => {
   it('limits failed logins', async () => {
-    const limited = makeApp({ rateLimits: { login: { max: 3, windowMs: 60_000 }, checkIn: { max: 100, windowMs: 60_000 }, register: { max: 100, windowMs: 60_000 } } });
-    const attempt = () => request(limited).post('/api/auth/admin/login').send({ identifier: 'ADM001', password: 'Wrong12345' });
+    const limited = makeApp({
+      rateLimits: {
+        login: { max: 3, windowMs: 60_000 },
+        checkIn: { max: 100, windowMs: 60_000 },
+        register: { max: 100, windowMs: 60_000 },
+      },
+    });
+    const attempt = () =>
+      request(limited).post('/api/auth/admin/login').send({ identifier: 'ADM001', password: 'Wrong12345' });
     for (let i = 0; i < 3; i += 1) expect((await attempt()).status).toBe(401);
     const blocked = await attempt();
     expect(blocked.status).toBe(429);
@@ -215,10 +228,18 @@ describe('rate limiting', () => {
   });
 
   it('limits check-in and registration requests', async () => {
-    const limited = makeApp({ rateLimits: { login: { max: 100, windowMs: 60_000 }, checkIn: { max: 2, windowMs: 60_000 }, register: { max: 1, windowMs: 60_000 } } });
+    const limited = makeApp({
+      rateLimits: {
+        login: { max: 100, windowMs: 60_000 },
+        checkIn: { max: 2, windowMs: 60_000 },
+        register: { max: 1, windowMs: 60_000 },
+      },
+    });
     await request(limited).get('/api/students/1900001/open-courses');
     await request(limited).get('/api/students/1900001/open-courses');
-    expect((await request(limited).post('/api/attendance').send({ idNumber: '1900001', sessionId: 1 })).status).toBe(429);
+    expect((await request(limited).post('/api/attendance').send({ idNumber: '1900001', sessionId: 1 })).status).toBe(
+      429,
+    );
 
     await request(limited).post('/api/lecturers').send({});
     expect((await request(limited).post('/api/students').send({})).status).toBe(429);
@@ -227,7 +248,9 @@ describe('rate limiting', () => {
 
 describe('injection and information leaks', () => {
   it('treats SQL in inputs as plain data', async () => {
-    const login1 = await request(app).post('/api/auth/admin/login').send({ identifier: "' OR '1'='1' --", password: "' OR '1'='1" });
+    const login1 = await request(app)
+      .post('/api/auth/admin/login')
+      .send({ identifier: "' OR '1'='1' --", password: "' OR '1'='1" });
     expect(login1.status).toBe(401);
 
     const { agent } = await login(app, 'admin', 'ADM001');

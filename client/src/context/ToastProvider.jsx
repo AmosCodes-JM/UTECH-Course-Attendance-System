@@ -36,7 +36,12 @@ export function ToastProvider({ children }) {
               {t.title && <span className="alert-title">{t.title}</span>}
               {t.message}
             </div>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => dismiss(t.id)} aria-label="Dismiss notification">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => dismiss(t.id)}
+              aria-label="Dismiss notification"
+            >
               ✕
             </button>
           </div>

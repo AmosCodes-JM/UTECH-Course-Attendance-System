@@ -31,7 +31,12 @@ export function ProgramModulesPage() {
   const detailFields = [
     { name: 'level', label: 'Level', type: 'select', numeric: true, required: true, options: LEVEL_OPTIONS },
     { name: 'semesterSlot', label: 'Semester slot', type: 'select', required: true, options: SLOT_OPTIONS },
-    { name: 'choiceGroup', label: 'Either/or group (optional)', placeholder: 'e.g. ENS3001/MEE2003', hint: 'Modules sharing a group are alternatives.' },
+    {
+      name: 'choiceGroup',
+      label: 'Either/or group (optional)',
+      placeholder: 'e.g. ENS3001/MEE2003',
+      hint: 'Modules sharing a group are alternatives.',
+    },
   ];
   const newFields = [
     {
@@ -41,7 +46,9 @@ export function ProgramModulesPage() {
       numeric: true,
       required: true,
       placeholder: 'Select a module…',
-      options: (modules.data ?? []).filter((m) => !assigned.has(m.id)).map((m) => ({ value: m.id, label: `${m.code} – ${m.name}` })),
+      options: (modules.data ?? [])
+        .filter((m) => !assigned.has(m.id))
+        .map((m) => ({ value: m.id, label: `${m.code} – ${m.name}` })),
     },
     ...detailFields,
   ];
@@ -65,7 +72,11 @@ export function ProgramModulesPage() {
       <PageHeader
         title={program?.displayName ?? 'Programme modules'}
         subtitle="Level, semester slot and either/or group for each module. A module can belong to several programmes."
-        actions={<button className="btn btn-primary" onClick={() => setEditing('new')} disabled={!modules.data}>Add module to programme</button>}
+        actions={
+          <button className="btn btn-primary" onClick={() => setEditing('new')} disabled={!modules.data}>
+            Add module to programme
+          </button>
+        }
       />
       {editing && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
@@ -84,7 +95,15 @@ export function ProgramModulesPage() {
       {rows.error && <ErrorAlert error={rows.error} />}
       {rows.data && (
         <>
-          <input className="input" style={{ maxWidth: 320, marginBottom: '0.75rem' }} type="search" placeholder="Filter modules" aria-label="Filter modules" value={filter} onChange={(e) => setFilter(e.target.value)} />
+          <input
+            className="input"
+            style={{ maxWidth: 320, marginBottom: '0.75rem' }}
+            type="search"
+            placeholder="Filter modules"
+            aria-label="Filter modules"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
           <div className="table-wrap">
             <table className="table">
               <thead>
@@ -105,11 +124,29 @@ export function ProgramModulesPage() {
                     <td>{r.module.name}</td>
                     <td>{creditsLabel(r.module.credits)}</td>
                     <td>{r.level}</td>
-                    <td><span className={`badge ${r.semesterSlot === 'YEAR' ? 'badge-primary' : ''}`}>{slotLabel(r.semesterSlot)}</span></td>
-                    <td>{r.choiceGroup ? <span className="badge badge-accent">{r.choiceGroup}</span> : <span className="muted">—</span>}</td>
+                    <td>
+                      <span className={`badge ${r.semesterSlot === 'YEAR' ? 'badge-primary' : ''}`}>
+                        {slotLabel(r.semesterSlot)}
+                      </span>
+                    </td>
+                    <td>
+                      {r.choiceGroup ? (
+                        <span className="badge badge-accent">{r.choiceGroup}</span>
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </td>
                     <td className="actions">
-                      <button className="btn btn-ghost btn-sm" onClick={() => setEditing(r)}>Edit</button>
-                      <DeleteButton label="Remove" title={`Remove ${r.module.code} from this programme?`} successMessage="Module removed from programme." onDelete={() => adminApi.programModules.remove(programId, r.moduleId)} onDone={rows.reload}>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setEditing(r)}>
+                        Edit
+                      </button>
+                      <DeleteButton
+                        label="Remove"
+                        title={`Remove ${r.module.code} from this programme?`}
+                        successMessage="Module removed from programme."
+                        onDelete={() => adminApi.programModules.remove(programId, r.moduleId)}
+                        onDone={rows.reload}
+                      >
                         The module stays in the catalog and in other programmes.
                       </DeleteButton>
                     </td>

@@ -25,7 +25,9 @@ const get = (path) => admin.agent.get(`/api/admin${path}`);
 
 describe('POST /api/auth/admin/login', () => {
   it('signs administrators in and points them to /admin', async () => {
-    const res = await request(app).post('/api/auth/admin/login').send({ identifier: 'adm001', password: 'Password123' });
+    const res = await request(app)
+      .post('/api/auth/admin/login')
+      .send({ identifier: 'adm001', password: 'Password123' });
     expect(res.status).toBe(200);
     expect(res.body.data).toMatchObject({ user: { role: 'ADMIN' }, redirectTo: '/admin' });
   });
@@ -138,10 +140,17 @@ describe('programme-module assignments', () => {
     expect(added.status).toBe(201);
     expect(added.body.data).toMatchObject({ level: 4, semesterSlot: 'YEAR', choiceGroup: null });
 
-    const dup = await post(`/programs/${fx.programs.it.id}/modules`, { moduleId: fx.modules.PRJ4020.id, level: 4, semesterSlot: 'YEAR' });
+    const dup = await post(`/programs/${fx.programs.it.id}/modules`, {
+      moduleId: fx.modules.PRJ4020.id,
+      level: 4,
+      semesterSlot: 'YEAR',
+    });
     expect(dup.status).toBe(409);
 
-    const updated = await patch(`/programs/${fx.programs.it.id}/modules/${fx.modules.PRJ4020.id}`, { semesterSlot: '2', choiceGroup: 'X/Y' });
+    const updated = await patch(`/programs/${fx.programs.it.id}/modules/${fx.modules.PRJ4020.id}`, {
+      semesterSlot: '2',
+      choiceGroup: 'X/Y',
+    });
     expect(updated.body.data).toMatchObject({ semesterSlot: '2', choiceGroup: 'X/Y' });
 
     const list = await get(`/programs/${fx.programs.it.id}/modules`);
@@ -151,7 +160,11 @@ describe('programme-module assignments', () => {
   });
 
   it('only accepts semester slots 1, 2, YEAR or EITHER', async () => {
-    const res = await post(`/programs/${fx.programs.it.id}/modules`, { moduleId: fx.modules.PRJ4020.id, level: 4, semesterSlot: '3' });
+    const res = await post(`/programs/${fx.programs.it.id}/modules`, {
+      moduleId: fx.modules.PRJ4020.id,
+      level: 4,
+      semesterSlot: '3',
+    });
     expect(res.status).toBe(400);
   });
 });
@@ -164,7 +177,12 @@ describe('semester management', () => {
   });
 
   it('creates, updates and deletes a semester', async () => {
-    const created = await post('/semesters', { academicYear: '2095/2096', term: 1, startDate: '2095-09-01', endDate: '2095-12-31' });
+    const created = await post('/semesters', {
+      academicYear: '2095/2096',
+      term: 1,
+      startDate: '2095-09-01',
+      endDate: '2095-12-31',
+    });
     expect(created.status).toBe(201);
     expect(created.body.data.label).toBe('2095/2096 Semester 1');
 
@@ -176,10 +194,22 @@ describe('semester management', () => {
 
   it('rejects overlapping ranges, reversed dates, duplicates and bad years', async () => {
     const start = fx.semesters.current.startDate.toISOString().slice(0, 10);
-    expect((await post('/semesters', { academicYear: '2080/2081', term: 1, startDate: start, endDate: '2099-01-01' })).body.code).toBe('SEMESTER_OVERLAP');
-    expect((await post('/semesters', { academicYear: '2095/2096', term: 1, startDate: '2095-12-31', endDate: '2095-09-01' })).status).toBe(400);
-    expect((await post('/semesters', { academicYear: '2090/2091', term: 1, startDate: '2096-01-01', endDate: '2096-02-01' })).status).toBe(409);
-    expect((await post('/semesters', { academicYear: '2095/2097', term: 1, startDate: '2095-09-01', endDate: '2095-12-31' })).status).toBe(400);
+    expect(
+      (await post('/semesters', { academicYear: '2080/2081', term: 1, startDate: start, endDate: '2099-01-01' })).body
+        .code,
+    ).toBe('SEMESTER_OVERLAP');
+    expect(
+      (await post('/semesters', { academicYear: '2095/2096', term: 1, startDate: '2095-12-31', endDate: '2095-09-01' }))
+        .status,
+    ).toBe(400);
+    expect(
+      (await post('/semesters', { academicYear: '2090/2091', term: 1, startDate: '2096-01-01', endDate: '2096-02-01' }))
+        .status,
+    ).toBe(409);
+    expect(
+      (await post('/semesters', { academicYear: '2095/2097', term: 1, startDate: '2095-09-01', endDate: '2095-12-31' }))
+        .status,
+    ).toBe(400);
   });
 
   it('refuses to delete a semester that is in use', async () => {
@@ -214,7 +244,10 @@ describe('students and enrollments', () => {
     expect(conflict.body.code).toBe('EITHER_OR_CONFLICT');
 
     // The pair is allowed in different semesters.
-    const otherSemester = await post(`/students/${s2.id}/enrollments`, { moduleId: fx.modules.MEE2003.id, semesterId: fx.semesters.next.id });
+    const otherSemester = await post(`/students/${s2.id}/enrollments`, {
+      moduleId: fx.modules.MEE2003.id,
+      semesterId: fx.semesters.next.id,
+    });
     expect(otherSemester.status).toBe(201);
 
     const dup = await post(`/students/${s2.id}/enrollments`, { moduleId: fx.modules.ENS3001.id, semesterId });
@@ -236,7 +269,11 @@ describe('students and enrollments', () => {
 describe('lecturer accounts and course assignments', () => {
   it('creates and lists lecturers without exposing password hashes', async () => {
     const created = await post('/lecturers', {
-      firstName: 'New', lastName: 'Lecturer', email: 'new@staff.test.example', workId: 'LEC777', password: 'Welcome123',
+      firstName: 'New',
+      lastName: 'Lecturer',
+      email: 'new@staff.test.example',
+      workId: 'LEC777',
+      password: 'Welcome123',
     });
     expect(created.status).toBe(201);
     expect(created.body.data.role).toBe('LECTURER');
@@ -250,7 +287,9 @@ describe('lecturer accounts and course assignments', () => {
     const res = await patch(`/lecturers/${fx.users.lecturer2.id}`, { lastName: 'Renamed', password: 'NewPass456' });
     expect(res.status).toBe(200);
     expect(res.body.data.lastName).toBe('Renamed');
-    const loginRes = await request(app).post('/api/auth/lecturer/login').send({ identifier: 'LEC002', password: 'NewPass456' });
+    const loginRes = await request(app)
+      .post('/api/auth/lecturer/login')
+      .send({ identifier: 'LEC002', password: 'NewPass456' });
     expect(loginRes.status).toBe(200);
   });
 
@@ -280,11 +319,17 @@ describe('lecturer accounts and course assignments', () => {
 describe('administrator accounts', () => {
   it('lets an authenticated administrator create another administrator', async () => {
     const res = await post('/admins', {
-      firstName: 'Second', lastName: 'Admin', email: 'admin2@test.example', workId: 'ADM002', password: 'Another123',
+      firstName: 'Second',
+      lastName: 'Admin',
+      email: 'admin2@test.example',
+      workId: 'ADM002',
+      password: 'Another123',
     });
     expect(res.status).toBe(201);
     expect(res.body.data.role).toBe('ADMIN');
-    const loginRes = await request(app).post('/api/auth/admin/login').send({ identifier: 'ADM002', password: 'Another123' });
+    const loginRes = await request(app)
+      .post('/api/auth/admin/login')
+      .send({ identifier: 'ADM002', password: 'Another123' });
     expect(loginRes.status).toBe(200);
     expect((await get('/admins')).body.data).toHaveLength(2);
   });

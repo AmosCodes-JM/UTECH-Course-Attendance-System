@@ -43,11 +43,6 @@ export function createClassSessionRouter() {
   const router = Router();
   router.use(requireLecturer, requireCsrf);
   router.post('/', validate({ body: z.strictObject({ moduleId: idParam }) }), lecturers.open);
-  router.patch(
-    '/:id/close',
-    validate({ params: z.object({ id: idParam }) }),
-    requireSessionOwnership,
-    lecturers.close,
-  );
+  router.patch('/:id/close', validate({ params: z.object({ id: idParam }) }), requireSessionOwnership, lecturers.close);
   return router;
 }

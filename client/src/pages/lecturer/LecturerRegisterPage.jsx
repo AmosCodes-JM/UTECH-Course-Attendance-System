@@ -25,7 +25,8 @@ function validateDetails(f) {
   if (!EMAIL.test(f.email.trim())) e.email = 'Enter a valid email address';
   if (!WORK_ID.test(f.workId.trim())) e.workId = 'Work ID must be 3–20 letters, digits or dashes';
   if (f.password.length < 8 || f.password.length > 72) e.password = 'Use 8–72 characters';
-  else if (!/[A-Za-z]/.test(f.password) || !/\d/.test(f.password)) e.password = 'Include at least one letter and one number';
+  else if (!/[A-Za-z]/.test(f.password) || !/\d/.test(f.password))
+    e.password = 'Include at least one letter and one number';
   if (f.confirmPassword !== f.password) e.confirmPassword = 'Passwords do not match';
   return e;
 }
@@ -34,7 +35,14 @@ export function LecturerRegisterPage() {
   useDocumentTitle('Lecturer registration');
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', workId: '', password: '', confirmPassword: '' });
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    workId: '',
+    password: '',
+    confirmPassword: '',
+  });
   const [programIds, setProgramIds] = useState([]);
   const [moduleIds, setModuleIds] = useState([]);
   const [errors, setErrors] = useState({});
@@ -137,7 +145,14 @@ export function LecturerRegisterPage() {
 
   const input = (id, label, props = {}) => (
     <FormField id={id} label={label} error={errors[id]} hint={props.hint}>
-      <input className="input" {...fieldProps(id, errors[id], props.hint)} value={form[id]} onChange={update(id)} required {...props.input} />
+      <input
+        className="input"
+        {...fieldProps(id, errors[id], props.hint)}
+        value={form[id]}
+        onChange={update(id)}
+        required
+        {...props.input}
+      />
     </FormField>
   );
 
@@ -168,7 +183,9 @@ export function LecturerRegisterPage() {
                   hint: '8–72 characters with at least one letter and one number',
                   input: { type: 'password', autoComplete: 'new-password' },
                 })}
-                {input('confirmPassword', 'Confirm password', { input: { type: 'password', autoComplete: 'new-password' } })}
+                {input('confirmPassword', 'Confirm password', {
+                  input: { type: 'password', autoComplete: 'new-password' },
+                })}
               </div>
               <button type="submit" className="btn btn-primary btn-lg">
                 Next: programmes & courses →
@@ -184,7 +201,13 @@ export function LecturerRegisterPage() {
               {programs.data && (
                 <>
                   {errors.programIds && <Alert type="error">{errors.programIds}</Alert>}
-                  <ProgramPicker id="programs" programs={programs.data} multiple value={programIds} onChange={changePrograms} />
+                  <ProgramPicker
+                    id="programs"
+                    programs={programs.data}
+                    multiple
+                    value={programIds}
+                    onChange={changePrograms}
+                  />
                 </>
               )}
 

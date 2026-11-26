@@ -44,15 +44,9 @@ export const password = z
   .max(72, 'Password must be 72 characters or fewer')
   .refine((v) => /[A-Za-z]/.test(v) && /\d/.test(v), 'Password must contain at least one letter and one number');
 
-export const loginIdentifier = z
-  .string({ error: 'Required' })
-  .trim()
-  .min(1, 'Enter your email or work ID')
-  .max(254);
+export const loginIdentifier = z.string({ error: 'Required' }).trim().min(1, 'Enter your email or work ID').max(254);
 
-export const dateString = z
-  .string()
-  .refine(isValidDateString, 'Use a valid date in YYYY-MM-DD format');
+export const dateString = z.string().refine(isValidDateString, 'Use a valid date in YYYY-MM-DD format');
 
 export const moduleCode = z
   .string({ error: 'Required' })

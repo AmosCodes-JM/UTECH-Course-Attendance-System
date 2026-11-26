@@ -16,7 +16,10 @@ export function StudentsPage() {
 
   return (
     <>
-      <PageHeader title="Students" subtitle="Registered students and their enrollments. Students register themselves at /register." />
+      <PageHeader
+        title="Students"
+        subtitle="Registered students and their enrollments. Students register themselves at /register."
+      />
       <form
         className="btn-row"
         style={{ marginBottom: '1rem' }}
@@ -25,12 +28,26 @@ export function StudentsPage() {
           setSearch(query.trim());
         }}
       >
-        <input className="input" style={{ maxWidth: 360 }} type="search" placeholder="Search by ID, name or email" aria-label="Search students" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <button type="submit" className="btn btn-secondary">Search</button>
+        <input
+          className="input"
+          style={{ maxWidth: 360 }}
+          type="search"
+          placeholder="Search by ID, name or email"
+          aria-label="Search students"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <button type="submit" className="btn btn-secondary">
+          Search
+        </button>
       </form>
       {loading && <LoadingBlock />}
       {error && <ErrorAlert error={error} />}
-      {data && data.length === 0 && <EmptyState title="No students found">{search ? `Nothing matches “${search}”.` : 'No students have registered yet.'}</EmptyState>}
+      {data && data.length === 0 && (
+        <EmptyState title="No students found">
+          {search ? `Nothing matches “${search}”.` : 'No students have registered yet.'}
+        </EmptyState>
+      )}
       {data && data.length > 0 && (
         <div className="table-wrap">
           <table className="table">
@@ -49,13 +66,17 @@ export function StudentsPage() {
               {data.map((s) => (
                 <tr key={s.id}>
                   <td className="mono">{s.idNumber}</td>
-                  <td>{s.firstName} {s.lastName}</td>
+                  <td>
+                    {s.firstName} {s.lastName}
+                  </td>
                   <td>{s.email}</td>
                   <td>{s.program.displayName}</td>
                   <td>{s.currentEnrollmentCount}</td>
                   <td>{s.attendanceCount}</td>
                   <td className="actions">
-                    <Link className="btn btn-secondary btn-sm" to={`/admin/students/${s.id}`}>Manage</Link>
+                    <Link className="btn btn-secondary btn-sm" to={`/admin/students/${s.id}`}>
+                      Manage
+                    </Link>
                   </td>
                 </tr>
               ))}

@@ -89,16 +89,28 @@ async function main() {
 
   // ---- accounts (development only) ----
   await upsertUser({
-    email: 'admin@example.com', workId: 'ADMIN001', firstName: 'Dev', lastName: 'Administrator',
-    role: 'ADMIN', password: DEV_ADMIN_PASSWORD,
+    email: 'admin@example.com',
+    workId: 'ADMIN001',
+    firstName: 'Dev',
+    lastName: 'Administrator',
+    role: 'ADMIN',
+    password: DEV_ADMIN_PASSWORD,
   });
   const lecturer1 = await upsertUser({
-    email: 'lecturer1@example.com', workId: 'LEC001', firstName: 'Morgan', lastName: 'Ellis',
-    role: 'LECTURER', password: DEV_LECTURER_PASSWORD,
+    email: 'lecturer1@example.com',
+    workId: 'LEC001',
+    firstName: 'Morgan',
+    lastName: 'Ellis',
+    role: 'LECTURER',
+    password: DEV_LECTURER_PASSWORD,
   });
   const lecturer2 = await upsertUser({
-    email: 'lecturer2@example.com', workId: 'LEC002', firstName: 'Taylor', lastName: 'Brooks',
-    role: 'LECTURER', password: DEV_LECTURER_PASSWORD,
+    email: 'lecturer2@example.com',
+    workId: 'LEC002',
+    firstName: 'Taylor',
+    lastName: 'Brooks',
+    role: 'LECTURER',
+    password: DEV_LECTURER_PASSWORD,
   });
 
   const l1Modules = await moduleIdsByCode(plan.lecturer1);
@@ -121,7 +133,11 @@ async function main() {
   const studentRows = [];
   for (const s of students) {
     studentRows.push(
-      await prisma.student.upsert({ where: { idNumber: s.idNumber }, update: {}, create: { ...s, programId: program.id } }),
+      await prisma.student.upsert({
+        where: { idNumber: s.idNumber },
+        update: {},
+        create: { ...s, programId: program.id },
+      }),
     );
   }
   // The first three take every sample course; Sam takes only lecturer 2's.
@@ -129,7 +145,9 @@ async function main() {
   const allCourses = [...l1Modules, ...l2Modules.slice(0, 2)];
   await prisma.enrollment.createMany({
     data: [
-      ...studentRows.slice(0, 3).flatMap((st) => allCourses.map((moduleId) => ({ studentId: st.id, moduleId, semesterId: semester.id }))),
+      ...studentRows
+        .slice(0, 3)
+        .flatMap((st) => allCourses.map((moduleId) => ({ studentId: st.id, moduleId, semesterId: semester.id }))),
       ...l2Modules.slice(0, 2).map((moduleId) => ({ studentId: studentRows[3].id, moduleId, semesterId: semester.id })),
     ],
     skipDuplicates: true,

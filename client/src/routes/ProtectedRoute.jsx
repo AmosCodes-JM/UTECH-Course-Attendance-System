@@ -16,7 +16,9 @@ export function ProtectedRoute({ role, loginPath }) {
   if (status === 'loading') return <LoadingBlock message="Checking your session…" />;
 
   if (!user) {
-    return <Navigate to={loginPath} replace state={{ from: location.pathname + location.search, expired: sessionExpired }} />;
+    return (
+      <Navigate to={loginPath} replace state={{ from: location.pathname + location.search, expired: sessionExpired }} />
+    );
   }
 
   if (user.role !== role) {

@@ -85,7 +85,10 @@ export async function deleteProgram(id) {
   await findOr404('program', id, 'Programme');
   const students = await prisma.student.count({ where: { programId: id } });
   if (students > 0) {
-    throw AppError.conflict(`${students} student(s) are registered in this programme, so it cannot be deleted.`, 'IN_USE');
+    throw AppError.conflict(
+      `${students} student(s) are registered in this programme, so it cannot be deleted.`,
+      'IN_USE',
+    );
   }
   // Its program_modules rows are removed by ON DELETE CASCADE; modules stay.
   await prisma.program.delete({ where: { id } });
@@ -270,7 +273,10 @@ export async function deleteSemester(id) {
     prisma.classSession.count({ where: { semesterId: id } }),
   ]);
   if (enrollments + assignments + sessions > 0) {
-    throw AppError.conflict('This semester already has enrollments, assignments or sessions, so it cannot be deleted.', 'IN_USE');
+    throw AppError.conflict(
+      'This semester already has enrollments, assignments or sessions, so it cannot be deleted.',
+      'IN_USE',
+    );
   }
   await prisma.semester.delete({ where: { id } });
 }

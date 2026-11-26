@@ -78,19 +78,25 @@ describe('POST /api/attendance', () => {
 
   it('rejects check-in after the lecturer closes the session through the API', async () => {
     const { agent, csrf } = await login(app, 'lecturer', 'LEC001');
-    const closeRes = await agent.patch(`/api/class-sessions/${session.id}/close`).set("X-CSRF-Token", csrf);
+    const closeRes = await agent.patch(`/api/class-sessions/${session.id}/close`).set('X-CSRF-Token', csrf);
     expect(closeRes.status, JSON.stringify(closeRes.body)).toBe(200);
     const res = await checkIn({ idNumber: fx.students.s1.idNumber, sessionId: session.id });
     expect(res.status).toBe(409);
   });
 
   it('returns 404 for unknown sessions and unknown students', async () => {
-    expect((await checkIn({ idNumber: fx.students.s1.idNumber, sessionId: 999999 })).body.code).toBe('SESSION_NOT_FOUND');
+    expect((await checkIn({ idNumber: fx.students.s1.idNumber, sessionId: 999999 })).body.code).toBe(
+      'SESSION_NOT_FOUND',
+    );
     expect((await checkIn({ idNumber: '7777777', sessionId: session.id })).body.code).toBe('STUDENT_NOT_FOUND');
   });
 
   it('rejects a client-supplied timestamp instead of trusting it', async () => {
-    const res = await checkIn({ idNumber: fx.students.s1.idNumber, sessionId: session.id, checkedInAt: '2001-01-01T00:00:00Z' });
+    const res = await checkIn({
+      idNumber: fx.students.s1.idNumber,
+      sessionId: session.id,
+      checkedInAt: '2001-01-01T00:00:00Z',
+    });
     expect(res.status).toBe(400);
     expect(await prisma.attendance.count()).toBe(0);
   });
@@ -112,7 +118,9 @@ describe('database-level duplicate prevention', () => {
 
   it('blocks a duplicate even when inserted directly, bypassing the API', async () => {
     await prisma.attendance.create({ data: { sessionId: session.id, studentId: fx.students.s1.id } });
-    await expect(prisma.attendance.create({ data: { sessionId: session.id, studentId: fx.students.s1.id } })).rejects.toMatchObject({
+    await expect(
+      prisma.attendance.create({ data: { sessionId: session.id, studentId: fx.students.s1.id } }),
+    ).rejects.toMatchObject({
       code: 'P2002',
     });
   });

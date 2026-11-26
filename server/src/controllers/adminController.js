@@ -39,7 +39,8 @@ export const removeProgramModule = async (req, res) =>
 // Semesters
 export const listSemesters = async (_req, res) => send(res, await catalog.listSemesters());
 export const createSemester = async (req, res) => send(res, await catalog.createSemester(v(req).body), 201);
-export const updateSemester = async (req, res) => send(res, await catalog.updateSemester(v(req).params.id, v(req).body));
+export const updateSemester = async (req, res) =>
+  send(res, await catalog.updateSemester(v(req).params.id, v(req).body));
 export const deleteSemester = async (req, res) => send(res, await catalog.deleteSemester(v(req).params.id));
 
 // Students and enrollments
@@ -47,7 +48,8 @@ export const listStudents = async (req, res) => send(res, await people.listStude
 export const getStudent = async (req, res) => send(res, await people.getStudent(v(req).params.id));
 export const updateStudent = async (req, res) => send(res, await people.updateStudent(v(req).params.id, v(req).body));
 export const deleteStudent = async (req, res) => send(res, await people.deleteStudent(v(req).params.id));
-export const addEnrollment = async (req, res) => send(res, await people.addEnrollment(v(req).params.id, v(req).body), 201);
+export const addEnrollment = async (req, res) =>
+  send(res, await people.addEnrollment(v(req).params.id, v(req).body), 201);
 export const removeEnrollment = async (req, res) =>
   send(res, await people.removeEnrollment(v(req).params.id, v(req).params.semesterId, v(req).params.moduleId));
 
@@ -57,7 +59,8 @@ export const getLecturer = async (req, res) => send(res, await people.getLecture
 export const createLecturer = async (req, res) => send(res, await people.createLecturer(v(req).body), 201);
 export const updateLecturer = async (req, res) => send(res, await people.updateLecturer(v(req).params.id, v(req).body));
 export const deleteLecturer = async (req, res) => send(res, await people.deleteLecturer(v(req).params.id));
-export const addAssignment = async (req, res) => send(res, await people.addAssignment(v(req).params.id, v(req).body), 201);
+export const addAssignment = async (req, res) =>
+  send(res, await people.addAssignment(v(req).params.id, v(req).body), 201);
 export const removeAssignment = async (req, res) =>
   send(res, await people.removeAssignment(v(req).params.id, v(req).params.semesterId, v(req).params.moduleId));
 

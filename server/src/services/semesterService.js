@@ -34,9 +34,7 @@ export function isSlotAvailableInTerm(slot, term) {
  * ('YYYY-MM-DD'). Dates may be Date objects (from Prisma) or strings.
  */
 export function findCurrentSemester(semesters, today) {
-  return (
-    semesters.find((s) => toDateOnly(s.startDate) <= today && today <= toDateOnly(s.endDate)) ?? null
-  );
+  return semesters.find((s) => toDateOnly(s.startDate) <= today && today <= toDateOnly(s.endDate)) ?? null;
 }
 
 /** The semester containing today's date, or null between semesters. */

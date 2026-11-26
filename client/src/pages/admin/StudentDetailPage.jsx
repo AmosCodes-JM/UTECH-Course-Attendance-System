@@ -33,12 +33,37 @@ export function StudentDetailPage() {
     { name: 'email', label: 'Email', type: 'email', required: true },
     { name: 'firstName', label: 'First name', required: true },
     { name: 'lastName', label: 'Last name', required: true },
-    { name: 'programId', label: 'Programme', type: 'select', numeric: true, required: true, options: (programs.data ?? []).map((p) => ({ value: p.id, label: p.displayName })) },
+    {
+      name: 'programId',
+      label: 'Programme',
+      type: 'select',
+      numeric: true,
+      required: true,
+      options: (programs.data ?? []).map((p) => ({ value: p.id, label: p.displayName })),
+    },
   ];
   const currentSemester = semesters.data?.find((x) => x.isCurrent);
   const enrollFields = [
-    { name: 'semesterId', label: 'Semester', type: 'select', numeric: true, required: true, options: (semesters.data ?? []).map((x) => ({ value: x.id, label: `${x.label}${x.isCurrent ? ' (current)' : ''}` })) },
-    { name: 'moduleId', label: 'Module', type: 'select', numeric: true, required: true, placeholder: 'Select a module…', options: (modules.data ?? []).map((m) => ({ value: m.id, label: `${m.code} – ${m.name}` })) },
+    {
+      name: 'semesterId',
+      label: 'Semester',
+      type: 'select',
+      numeric: true,
+      required: true,
+      options: (semesters.data ?? []).map((x) => ({
+        value: x.id,
+        label: `${x.label}${x.isCurrent ? ' (current)' : ''}`,
+      })),
+    },
+    {
+      name: 'moduleId',
+      label: 'Module',
+      type: 'select',
+      numeric: true,
+      required: true,
+      placeholder: 'Select a module…',
+      options: (modules.data ?? []).map((m) => ({ value: m.id, label: `${m.code} – ${m.name}` })),
+    },
   ];
 
   // Group enrollments by semester for display.
@@ -72,8 +97,15 @@ export function StudentDetailPage() {
         subtitle={`ID ${s.idNumber} · ${s.program.displayName} · ${s.attendanceCount} check-in(s)`}
         actions={
           <>
-            <button className="btn btn-secondary" onClick={() => setEditing((v) => !v)}>{editing ? 'Close editor' : 'Edit details'}</button>
-            <DeleteButton title="Delete this student?" successMessage="Student deleted." onDelete={() => adminApi.students.remove(id)} onDone={() => navigate('/admin/students')}>
+            <button className="btn btn-secondary" onClick={() => setEditing((v) => !v)}>
+              {editing ? 'Close editor' : 'Edit details'}
+            </button>
+            <DeleteButton
+              title="Delete this student?"
+              successMessage="Student deleted."
+              onDelete={() => adminApi.students.remove(id)}
+              onDone={() => navigate('/admin/students')}
+            >
               Their enrollments are removed too. Students with attendance records cannot be deleted.
             </DeleteButton>
           </>
@@ -82,7 +114,12 @@ export function StudentDetailPage() {
       {editing && programs.data && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <h2>Edit details</h2>
-          <SimpleForm fields={detailFields} initialValues={s} onSubmit={saveDetails} onCancel={() => setEditing(false)} />
+          <SimpleForm
+            fields={detailFields}
+            initialValues={s}
+            onSubmit={saveDetails}
+            onCancel={() => setEditing(false)}
+          />
         </div>
       )}
 
@@ -93,7 +130,8 @@ export function StudentDetailPage() {
           {[...bySemester.values()].map(({ semester, modules: list }) => (
             <div key={semester.id} style={{ marginBottom: '1.25rem' }}>
               <h3>
-                {semester.label} {semester.id === currentSemester?.id && <span className="badge badge-open">Current</span>}
+                {semester.label}{' '}
+                {semester.id === currentSemester?.id && <span className="badge badge-open">Current</span>}
               </h3>
               <div className="table-wrap">
                 <table className="table">
@@ -104,7 +142,13 @@ export function StudentDetailPage() {
                         <td>{m.name}</td>
                         <td className="nowrap">{creditsLabel(m.credits)}</td>
                         <td className="actions">
-                          <DeleteButton label="Remove" title={`Remove ${m.code} for ${semester.label}?`} successMessage="Enrollment removed." onDelete={() => adminApi.enrollments.remove(id, semester.id, m.id)} onDone={student.reload}>
+                          <DeleteButton
+                            label="Remove"
+                            title={`Remove ${m.code} for ${semester.label}?`}
+                            successMessage="Enrollment removed."
+                            onDelete={() => adminApi.enrollments.remove(id, semester.id, m.id)}
+                            onDone={student.reload}
+                          >
                             The student will no longer be able to check in to {m.code} sessions in this semester.
                           </DeleteButton>
                         </td>
@@ -120,7 +164,14 @@ export function StudentDetailPage() {
           <h2>Add an enrollment</h2>
           <p className="muted">The either/or rule is checked against the student’s programme.</p>
           {semesters.data && modules.data && (
-            <SimpleForm key={s.enrollments.length} fields={enrollFields} columns={1} initialValues={{ semesterId: currentSemester?.id ?? '' }} submitLabel="Add enrollment" onSubmit={addEnrollment} />
+            <SimpleForm
+              key={s.enrollments.length}
+              fields={enrollFields}
+              columns={1}
+              initialValues={{ semesterId: currentSemester?.id ?? '' }}
+              submitLabel="Add enrollment"
+              onSubmit={addEnrollment}
+            />
           )}
         </aside>
       </div>

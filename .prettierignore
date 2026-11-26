@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+package-lock.json
+server/src/generated
+server/src/db/migrations
+server/src/db/catalog/scit-catalog.json
+docs/SCIT-DIET-SHEETS
+*.pdf

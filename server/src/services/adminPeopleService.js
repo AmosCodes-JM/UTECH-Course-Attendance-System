@@ -44,7 +44,10 @@ export async function getStudent(id) {
     where: { id },
     include: {
       program: true,
-      enrollments: { include: { module: true, semester: true }, orderBy: [{ semesterId: 'desc' }, { module: { code: 'asc' } }] },
+      enrollments: {
+        include: { module: true, semester: true },
+        orderBy: [{ semesterId: 'desc' }, { module: { code: 'asc' } }],
+      },
       _count: { select: { attendance: true } },
     },
   });
@@ -82,7 +85,10 @@ export async function updateStudent(id, data) {
 }
 
 export async function deleteStudent(id) {
-  const student = await prisma.student.findUnique({ where: { id }, include: { _count: { select: { attendance: true } } } });
+  const student = await prisma.student.findUnique({
+    where: { id },
+    include: { _count: { select: { attendance: true } } },
+  });
   if (!student) throw AppError.notFound('Student not found.');
   if (student._count.attendance > 0) {
     throw AppError.conflict('This student has attendance records, so the account cannot be deleted.', 'IN_USE');
@@ -94,8 +100,10 @@ export async function deleteStudent(id) {
 export async function addEnrollment(studentId, { moduleId, semesterId }) {
   const student = await prisma.student.findUnique({ where: { id: studentId } });
   if (!student) throw AppError.notFound('Student not found.');
-  if (!(await prisma.module.findUnique({ where: { id: moduleId } }))) throw AppError.badRequest('That module does not exist.');
-  if (!(await prisma.semester.findUnique({ where: { id: semesterId } }))) throw AppError.badRequest('That semester does not exist.');
+  if (!(await prisma.module.findUnique({ where: { id: moduleId } })))
+    throw AppError.badRequest('That module does not exist.');
+  if (!(await prisma.semester.findUnique({ where: { id: semesterId } })))
+    throw AppError.badRequest('That semester does not exist.');
 
   const existing = await prisma.enrollment.findMany({ where: { studentId, semesterId }, select: { moduleId: true } });
   await assertEitherOrRespected(student.programId, [...existing.map((e) => e.moduleId), moduleId]);
@@ -103,7 +111,8 @@ export async function addEnrollment(studentId, { moduleId, semesterId }) {
   try {
     await prisma.enrollment.create({ data: { studentId, moduleId, semesterId } });
   } catch (err) {
-    if (isUniqueViolation(err)) throw AppError.conflict('The student is already enrolled in this module for that semester.', 'DUPLICATE');
+    if (isUniqueViolation(err))
+      throw AppError.conflict('The student is already enrolled in this module for that semester.', 'DUPLICATE');
     throw err;
   }
   return getStudent(studentId);
@@ -133,7 +142,11 @@ export async function listLecturers(search) {
     include: { _count: { select: { lecturerModules: current ? { where: { semesterId: current.id } } : true } } },
     orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }],
   });
-  return lecturers.map((u) => ({ ...serializeUser(u), createdAt: u.createdAt, currentCourseCount: u._count.lecturerModules }));
+  return lecturers.map((u) => ({
+    ...serializeUser(u),
+    createdAt: u.createdAt,
+    currentCourseCount: u._count.lecturerModules,
+  }));
 }
 
 export async function getLecturer(id) {
@@ -189,19 +202,25 @@ export async function deleteLecturer(id) {
   await findUserWithRole(id, 'LECTURER');
   const sessions = await prisma.classSession.count({ where: { lecturerId: id } });
   if (sessions > 0) {
-    throw AppError.conflict('This lecturer has class sessions with attendance history, so the account cannot be deleted.', 'IN_USE');
+    throw AppError.conflict(
+      'This lecturer has class sessions with attendance history, so the account cannot be deleted.',
+      'IN_USE',
+    );
   }
   await prisma.user.delete({ where: { id } }); // lecturer_modules cascade
 }
 
 export async function addAssignment(userId, { moduleId, semesterId }) {
   await findUserWithRole(userId, 'LECTURER');
-  if (!(await prisma.module.findUnique({ where: { id: moduleId } }))) throw AppError.badRequest('That module does not exist.');
-  if (!(await prisma.semester.findUnique({ where: { id: semesterId } }))) throw AppError.badRequest('That semester does not exist.');
+  if (!(await prisma.module.findUnique({ where: { id: moduleId } })))
+    throw AppError.badRequest('That module does not exist.');
+  if (!(await prisma.semester.findUnique({ where: { id: semesterId } })))
+    throw AppError.badRequest('That semester does not exist.');
   try {
     await prisma.lecturerModule.create({ data: { userId, moduleId, semesterId } });
   } catch (err) {
-    if (isUniqueViolation(err)) throw AppError.conflict('The lecturer is already assigned to this module for that semester.', 'DUPLICATE');
+    if (isUniqueViolation(err))
+      throw AppError.conflict('The lecturer is already assigned to this module for that semester.', 'DUPLICATE');
     throw err;
   }
   return getLecturer(userId);
@@ -211,9 +230,14 @@ export async function removeAssignment(userId, semesterId, moduleId) {
   await findUserWithRole(userId, 'LECTURER');
   const key = { userId_moduleId_semesterId: { userId, moduleId, semesterId } };
   if (!(await prisma.lecturerModule.findUnique({ where: key }))) throw AppError.notFound('Assignment not found.');
-  const openSessions = await prisma.classSession.count({ where: { lecturerId: userId, moduleId, semesterId, closedAt: null } });
+  const openSessions = await prisma.classSession.count({
+    where: { lecturerId: userId, moduleId, semesterId, closedAt: null },
+  });
   if (openSessions > 0) {
-    throw AppError.conflict('The lecturer has an open session for this module. It must be closed first.', 'SESSION_OPEN');
+    throw AppError.conflict(
+      'The lecturer has an open session for this module. It must be closed first.',
+      'SESSION_OPEN',
+    );
   }
   await prisma.lecturerModule.delete({ where: key });
   return getLecturer(userId);
@@ -247,6 +271,15 @@ export async function getOverview() {
   ]);
   return {
     currentSemester: serializeSemester(current),
-    counts: { schools, programs, modules, students, lecturers, admins, openSessions, attendanceLast24h: attendanceToday },
+    counts: {
+      schools,
+      programs,
+      modules,
+      students,
+      lecturers,
+      admins,
+      openSessions,
+      attendanceLast24h: attendanceToday,
+    },
   };
 }

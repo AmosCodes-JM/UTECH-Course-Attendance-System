@@ -51,7 +51,8 @@ export function LecturerDashboardPage() {
 
       {data && !data.semester && (
         <EmptyState title="No active semester">
-          There is no semester running today, so there are no courses to show. Contact an administrator if this is wrong.
+          There is no semester running today, so there are no courses to show. Contact an administrator if this is
+          wrong.
         </EmptyState>
       )}
 

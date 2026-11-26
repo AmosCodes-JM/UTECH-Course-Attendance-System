@@ -27,7 +27,11 @@ describe('SCIT catalog transcribed from the diet sheets', () => {
   it('shares Year 1 and 2 modules between the Computer Science and IT majors', () => {
     const cs = program('BSc Computing', 'Computer Science');
     const it_ = program('BSc Computing', 'Information Technology');
-    const years12 = (p) => p.modules.filter((m) => m.level <= 2).map((m) => m.code).sort();
+    const years12 = (p) =>
+      p.modules
+        .filter((m) => m.level <= 2)
+        .map((m) => m.code)
+        .sort();
     expect(years12(cs)).toEqual(years12(it_));
     expect(row(cs, 'CMP1024')).toMatchObject({ level: 1, semesterSlot: 'SEM1' });
   });

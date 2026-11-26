@@ -102,7 +102,11 @@ export function createAdminRouter() {
   router.get('/students/:id', validate({ params: idParams }), admin.getStudent);
   router.patch('/students/:id', validate({ params: idParams, body: studentBody.partial() }), admin.updateStudent);
   router.delete('/students/:id', validate({ params: idParams }), admin.deleteStudent);
-  router.post('/students/:id/enrollments', validate({ params: idParams, body: moduleSemesterBody }), admin.addEnrollment);
+  router.post(
+    '/students/:id/enrollments',
+    validate({ params: idParams, body: moduleSemesterBody }),
+    admin.addEnrollment,
+  );
   router.delete(
     '/students/:id/enrollments/:semesterId/:moduleId',
     validate({ params: pairParams }),

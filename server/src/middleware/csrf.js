@@ -30,7 +30,10 @@ function tokensMatch(expected, provided) {
 export function requireCsrf(req, _res, next) {
   if (SAFE_METHODS.has(req.method)) return next();
   if (!tokensMatch(req.session?.csrfToken, req.get('x-csrf-token'))) {
-    throw AppError.forbidden('Your security token is missing or expired. Refresh the page and try again.', 'CSRF_INVALID');
+    throw AppError.forbidden(
+      'Your security token is missing or expired. Refresh the page and try again.',
+      'CSRF_INVALID',
+    );
   }
   next();
 }

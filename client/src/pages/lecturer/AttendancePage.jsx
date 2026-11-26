@@ -49,9 +49,7 @@ export function AttendancePage() {
         <FilterBar courses={courses.data.courses} moduleId={moduleId} date={date} onChange={changeFilters} />
       )}
 
-      {!moduleId && (
-        <EmptyState title="Choose a course">Select one of your courses to see who checked in.</EmptyState>
-      )}
+      {!moduleId && <EmptyState title="Choose a course">Select one of your courses to see who checked in.</EmptyState>}
       {moduleId && attendance.loading && <LoadingBlock message="Loading attendance…" />}
       {moduleId && attendance.error && <ErrorAlert error={attendance.error} title="Could not load attendance" />}
 
@@ -62,12 +60,15 @@ export function AttendancePage() {
               {report.module.code} – {report.module.name}
             </h2>
             <span className="badge badge-primary">
-              {report.date ? `Date: ${report.date}` : 'All dates'} · {report.total} check-in{report.total === 1 ? '' : 's'}
+              {report.date ? `Date: ${report.date}` : 'All dates'} · {report.total} check-in
+              {report.total === 1 ? '' : 's'}
             </span>
           </div>
           {report.total === 0 ? (
             <EmptyState title="No check-ins found">
-              {report.date ? 'Nobody checked in to this course on that date.' : 'Nobody has checked in to this course yet.'}
+              {report.date
+                ? 'Nobody checked in to this course on that date.'
+                : 'Nobody has checked in to this course yet.'}
             </EmptyState>
           ) : (
             <AttendanceTable records={report.records} timezone={report.timezone} />

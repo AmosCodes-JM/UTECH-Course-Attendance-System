@@ -11,7 +11,17 @@ import { adminApi } from '../../services/endpoints.js';
 
 const FIELDS = [
   { name: 'academicYear', label: 'Academic year', required: true, placeholder: '2026/2027' },
-  { name: 'term', label: 'Term', type: 'select', numeric: true, required: true, options: [{ value: 1, label: 'Semester 1' }, { value: 2, label: 'Semester 2' }] },
+  {
+    name: 'term',
+    label: 'Term',
+    type: 'select',
+    numeric: true,
+    required: true,
+    options: [
+      { value: 1, label: 'Semester 1' },
+      { value: 2, label: 'Semester 2' },
+    ],
+  },
   { name: 'startDate', label: 'Start date', type: 'date', required: true },
   { name: 'endDate', label: 'End date', type: 'date', required: true },
 ];
@@ -35,18 +45,28 @@ export function SemestersPage() {
       <PageHeader
         title="Semesters"
         subtitle="The current semester is the one whose dates include today."
-        actions={<button className="btn btn-primary" onClick={() => setEditing('new')}>Add semester</button>}
+        actions={
+          <button className="btn btn-primary" onClick={() => setEditing('new')}>
+            Add semester
+          </button>
+        }
       />
       <div style={{ marginBottom: '1.25rem' }}>
         <Alert type="info">
-          Standard calendar: Semester 1 runs September–December and Semester 2 January–May. Year-long modules are available in both.
-          Date ranges may not overlap.
+          Standard calendar: Semester 1 runs September–December and Semester 2 January–May. Year-long modules are
+          available in both. Date ranges may not overlap.
         </Alert>
       </div>
       {editing && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <h2>{editing === 'new' ? 'New semester' : `Edit ${editing.label}`}</h2>
-          <SimpleForm key={editing.id ?? 'new'} fields={FIELDS} initialValues={editing === 'new' ? {} : editing} onSubmit={save} onCancel={() => setEditing(null)} />
+          <SimpleForm
+            key={editing.id ?? 'new'}
+            fields={FIELDS}
+            initialValues={editing === 'new' ? {} : editing}
+            onSubmit={save}
+            onCancel={() => setEditing(null)}
+          />
         </div>
       )}
       {loading && <LoadingBlock />}
@@ -70,13 +90,22 @@ export function SemestersPage() {
                   <td>{s.label}</td>
                   <td className="nowrap">{s.startDate}</td>
                   <td className="nowrap">{s.endDate}</td>
-                  <td>{s.isCurrent ? <span className="badge badge-open">Current</span> : <span className="muted">—</span>}</td>
+                  <td>
+                    {s.isCurrent ? <span className="badge badge-open">Current</span> : <span className="muted">—</span>}
+                  </td>
                   <td className="muted" style={{ fontSize: '0.85rem' }}>
-                    {s.usage.enrollments} enrollments · {s.usage.lecturerModules} assignments · {s.usage.classSessions} sessions
+                    {s.usage.enrollments} enrollments · {s.usage.lecturerModules} assignments · {s.usage.classSessions}{' '}
+                    sessions
                   </td>
                   <td className="actions">
-                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(s)}>Edit</button>
-                    <DeleteButton title={`Delete ${s.label}?`} onDelete={() => adminApi.semesters.remove(s.id)} onDone={reload}>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(s)}>
+                      Edit
+                    </button>
+                    <DeleteButton
+                      title={`Delete ${s.label}?`}
+                      onDelete={() => adminApi.semesters.remove(s.id)}
+                      onDone={reload}
+                    >
                       Semesters that already have enrollments, assignments or sessions cannot be deleted.
                     </DeleteButton>
                   </td>

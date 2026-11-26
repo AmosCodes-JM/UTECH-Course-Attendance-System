@@ -26,7 +26,14 @@ export function AdminsPage() {
 
   return (
     <>
-      <PageHeader title="Administrators" actions={<button className="btn btn-primary" onClick={() => setCreating(true)}>Add administrator</button>} />
+      <PageHeader
+        title="Administrators"
+        actions={
+          <button className="btn btn-primary" onClick={() => setCreating(true)}>
+            Add administrator
+          </button>
+        }
+      />
       <div style={{ marginBottom: '1.25rem' }}>
         <Alert type="warning" title="Administrators have full access">
           Only create administrator accounts for people who manage the catalog and user accounts.
@@ -35,7 +42,12 @@ export function AdminsPage() {
       {creating && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <h2>New administrator</h2>
-          <SimpleForm fields={ACCOUNT_FIELDS} onSubmit={create} onCancel={() => setCreating(false)} submitLabel="Create administrator" />
+          <SimpleForm
+            fields={ACCOUNT_FIELDS}
+            onSubmit={create}
+            onCancel={() => setCreating(false)}
+            submitLabel="Create administrator"
+          />
         </div>
       )}
       {loading && <LoadingBlock />}
@@ -54,7 +66,9 @@ export function AdminsPage() {
               {data.map((a) => (
                 <tr key={a.id}>
                   <td className="mono">{a.workId}</td>
-                  <td>{a.firstName} {a.lastName}</td>
+                  <td>
+                    {a.firstName} {a.lastName}
+                  </td>
                   <td>{a.email}</td>
                 </tr>
               ))}

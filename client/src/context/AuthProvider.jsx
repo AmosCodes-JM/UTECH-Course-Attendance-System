@@ -36,7 +36,9 @@ export function AuthProvider({ children }) {
   const login = useCallback(
     async (portal, identifier, password) => {
       const data =
-        portal === 'admin' ? await authApi.adminLogin(identifier, password) : await authApi.lecturerLogin(identifier, password);
+        portal === 'admin'
+          ? await authApi.adminLogin(identifier, password)
+          : await authApi.lecturerLogin(identifier, password);
       applySession(data);
       return data;
     },

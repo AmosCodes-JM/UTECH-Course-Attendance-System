@@ -131,9 +131,7 @@
   align-content: start;
   justify-items: center;
   padding: var(--space-5) var(--space-4) var(--space-7);
-  background:
-    radial-gradient(1200px 400px at 50% -10%, rgba(242, 178, 51, 0.18), transparent 70%),
-    var(--color-bg);
+  background: radial-gradient(1200px 400px at 50% -10%, rgba(242, 178, 51, 0.18), transparent 70%), var(--color-bg);
 }
 .kiosk-clock {
   text-align: center;

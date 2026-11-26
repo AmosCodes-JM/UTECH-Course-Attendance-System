@@ -74,7 +74,10 @@ export function CoursePicker({ id, modules, selectedIds, onChange, enforceChoice
           <h4 id={`${id}-level-${level}`}>Level {level}</h4>
           {list.map((m) => {
             const isSelected = selected.has(m.id);
-            const partners = enforceChoiceGroups && m.choiceGroup ? (groupMembers.get(m.choiceGroup) ?? []).filter((o) => o.id !== m.id) : [];
+            const partners =
+              enforceChoiceGroups && m.choiceGroup
+                ? (groupMembers.get(m.choiceGroup) ?? []).filter((o) => o.id !== m.id)
+                : [];
             return (
               <label key={m.id} className={`picker-option ${isSelected ? 'selected' : ''}`}>
                 <input type="checkbox" checked={isSelected} onChange={() => toggle(m)} />
@@ -84,9 +87,15 @@ export function CoursePicker({ id, modules, selectedIds, onChange, enforceChoice
                     <span className="badge">{creditsLabel(m.credits)}</span>
                     <span className="badge">{slotLabel(m.semesterSlot)}</span>
                     {partners.length > 0 && (
-                      <span className="badge badge-accent">Either/or with {partners.map((p) => p.code).join(', ')}</span>
+                      <span className="badge badge-accent">
+                        Either/or with {partners.map((p) => p.code).join(', ')}
+                      </span>
                     )}
-                    {m.programs && <span className="muted" style={{ fontSize: '0.85rem' }}>{m.programs.join(' · ')}</span>}
+                    {m.programs && (
+                      <span className="muted" style={{ fontSize: '0.85rem' }}>
+                        {m.programs.join(' · ')}
+                      </span>
+                    )}
                   </span>
                 </span>
               </label>

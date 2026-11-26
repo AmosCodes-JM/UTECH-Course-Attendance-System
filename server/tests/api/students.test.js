@@ -52,19 +52,25 @@ describe('POST /api/students (registration)', () => {
   });
 
   it('rejects a duplicate student ID number', async () => {
-    const res = await request(app).post('/api/students').send(newStudent({ idNumber: fx.students.s1.idNumber }));
+    const res = await request(app)
+      .post('/api/students')
+      .send(newStudent({ idNumber: fx.students.s1.idNumber }));
     expect(res.status).toBe(409);
     expect(res.body.code).toBe('DUPLICATE_ID_NUMBER');
   });
 
   it('rejects a duplicate email address (case-insensitive)', async () => {
-    const res = await request(app).post('/api/students').send(newStudent({ email: 'S1@Students.Test.Example' }));
+    const res = await request(app)
+      .post('/api/students')
+      .send(newStudent({ email: 'S1@Students.Test.Example' }));
     expect(res.status).toBe(409);
     expect(res.body.code).toBe('DUPLICATE_EMAIL');
   });
 
   it('validates required fields and email format', async () => {
-    const res = await request(app).post('/api/students').send(newStudent({ firstName: '', email: 'nope' }));
+    const res = await request(app)
+      .post('/api/students')
+      .send(newStudent({ firstName: '', email: 'nope' }));
     expect(res.status).toBe(400);
     expect(res.body.code).toBe('VALIDATION_ERROR');
     const fields = res.body.errors.map((e) => e.field);
@@ -72,14 +78,24 @@ describe('POST /api/students (registration)', () => {
   });
 
   it('requires at least one module and a valid programme', async () => {
-    expect((await request(app).post('/api/students').send(newStudent({ moduleIds: [] }))).status).toBe(400);
-    const res = await request(app).post('/api/students').send(newStudent({ programId: 99999 }));
+    expect(
+      (
+        await request(app)
+          .post('/api/students')
+          .send(newStudent({ moduleIds: [] }))
+      ).status,
+    ).toBe(400);
+    const res = await request(app)
+      .post('/api/students')
+      .send(newStudent({ programId: 99999 }));
     expect(res.status).toBe(400);
     expect(res.body.code).toBe('INVALID_PROGRAM');
   });
 
   it('rejects modules that are not offered this semester (semester 2 module in semester 1)', async () => {
-    const res = await request(app).post('/api/students').send(newStudent({ moduleIds: [fx.modules.CMP1025.id] }));
+    const res = await request(app)
+      .post('/api/students')
+      .send(newStudent({ moduleIds: [fx.modules.CMP1025.id] }));
     expect(res.status).toBe(400);
     expect(res.body.code).toBe('MODULE_NOT_OFFERED');
   });
@@ -99,7 +115,9 @@ describe('POST /api/students (registration)', () => {
     expect(both.status).toBe(400);
     expect(both.body.code).toBe('EITHER_OR_CONFLICT');
 
-    const one = await request(app).post('/api/students').send(newStudent({ moduleIds: [fx.modules.ENS3001.id] }));
+    const one = await request(app)
+      .post('/api/students')
+      .send(newStudent({ moduleIds: [fx.modules.ENS3001.id] }));
     expect(one.status).toBe(201);
   });
 
@@ -111,7 +129,9 @@ describe('POST /api/students (registration)', () => {
   });
 
   it('refuses unknown fields (mass assignment)', async () => {
-    const res = await request(app).post('/api/students').send({ ...newStudent(), id: 1, createdAt: '2000-01-01' });
+    const res = await request(app)
+      .post('/api/students')
+      .send({ ...newStudent(), id: 1, createdAt: '2000-01-01' });
     expect(res.status).toBe(400);
   });
 
