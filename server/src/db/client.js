@@ -12,7 +12,15 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../generated/prisma/client.ts';
 import { config } from '../config/env.js';
 
-export const pool = new pg.Pool({ connectionString: config.databaseUrl, max: 10 });
+// Every connection uses the UTC timezone. Prisma's pg adapter sends and reads
+// timestamps as UTC; if PostgreSQL's session timezone were the server's local
+// zone, values written by Prisma and values from now() would disagree by the
+// UTC offset. (Displayed times are converted to APP_TIMEZONE in the app.)
+export const pool = new pg.Pool({
+  connectionString: config.databaseUrl,
+  max: 10,
+  options: '-c TimeZone=UTC',
+});
 
 export const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
